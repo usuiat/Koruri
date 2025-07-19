@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Koruri"
 include(":app")
- 
+include(":koruri")
