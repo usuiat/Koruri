@@ -3,6 +3,7 @@ package net.engawapg.lib.koruri
 import androidx.compose.runtime.BroadcastFrameClock
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
+import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
 import kotlinx.coroutines.CoroutineScope
@@ -13,31 +14,18 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.engawapg.lib.koruri.audio.KoruriAudio
 import net.engawapg.lib.koruri.audio.SineWaveGenerator
+import kotlin.coroutines.CoroutineContext
 
 fun runKoruri(content: @Composable () -> Unit) {
-    var updated = true
-    val applier = KoruriApplier(
-        root = KoruriNode(),
-        onChange = { updated = true },
-    )
     val clock = BroadcastFrameClock()
     val job = Job()
-    val recomposer = Recomposer(clock + job)
-    val composition = Composition(applier, recomposer)
-    composition.setContent(content)
-
-    Snapshot.registerApplyObserver { _, _ ->
-        updated = true
-    }
+    val koruri = Koruri(clock + job)
+    koruri.setContent(content)
 
     val audio = KoruriAudio().apply { start() }
-    val sineWaveGenerator = SineWaveGenerator()
 
     val scope = CoroutineScope(clock + job)
     scope.launch {
-        launch {
-            recomposer.runRecomposeAndApplyChanges()
-        }
         launch {
             while (true) {
                 val nano = System.nanoTime()
@@ -46,6 +34,37 @@ fun runKoruri(content: @Composable () -> Unit) {
             }
         }
         launch {
+            withContext(Dispatchers.IO) {
+                val bufferSize = 1024
+                while (true) {
+                    val buffer = koruri.getNextSamples(bufferSize)
+                    audio.write(buffer, bufferSize * 2)
+                }
+            }
+        }
+    }
+}
+
+private class Koruri(coroutineContext: CoroutineContext) {
+    private val coroutineScope = CoroutineScope(coroutineContext)
+    private val clock = checkNotNull(coroutineContext[MonotonicFrameClock]) {
+        "MonotonicFrameClock is required in the coroutine context"
+    }
+    private val sineWaveGenerator = SineWaveGenerator()
+    private var updated = true
+    val applier = KoruriApplier(
+        root = KoruriNode(),
+        onChange = { updated = true },
+    )
+    val recomposer = Recomposer(coroutineContext)
+    val composition = Composition(applier, recomposer)
+
+    init {
+        Snapshot.registerApplyObserver { _, _ ->
+            updated = true
+        }
+
+        coroutineScope.launch {
             while (true) {
                 clock.withFrameNanos {
                     if (updated) {
@@ -55,14 +74,16 @@ fun runKoruri(content: @Composable () -> Unit) {
                 }
             }
         }
-        launch {
-            withContext(Dispatchers.IO) {
-                val bufferSize = 1024
-                while (true) {
-                    val buffer = sineWaveGenerator.getNextSamples(bufferSize)
-                    audio.write(buffer, bufferSize * 2)
-                }
-            }
+        coroutineScope.launch {
+            recomposer.runRecomposeAndApplyChanges()
         }
+    }
+
+    fun setContent(content: @Composable () -> Unit) {
+        composition.setContent(content)
+    }
+
+    fun getNextSamples(numSamples: Int): ShortArray {
+        return sineWaveGenerator.getNextSamples(numSamples)
     }
 }
