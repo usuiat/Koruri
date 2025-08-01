@@ -1,29 +1,33 @@
-package net.engawapg.lib.koruri.audio
+package net.engawapg.lib.koruri.generator
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposeNode
-import net.engawapg.lib.koruri.KoruriApplier
-import net.engawapg.lib.koruri.KoruriNode
+import net.engawapg.lib.koruri.audio.Block
+import net.engawapg.lib.koruri.modifier.AudioModifier
+import net.engawapg.lib.koruri.modifier.KoruriModifier
 import kotlin.math.PI
 import kotlin.math.sin
 
 @Composable
 fun SineWave(frequency: Float) {
-    ComposeNode<KoruriNode, KoruriApplier>(
-        factory = ::KoruriNode,
-        update = {
-            set(frequency) { this.frequency = it }
-        }
+    Block(
+        modifier = KoruriModifier.sineWave(frequency)
     )
 }
 
-internal class SineWaveGenerator() {
+private fun KoruriModifier.sineWave(
+    frequency: Float,
+): KoruriModifier = this.then(
+    SineWaveModifier(frequency)
+)
+
+private class SineWaveModifier(
+    private val frequency: Float,
+) : AudioModifier {
     private val sampleRate = 48000
-    var frequency: Float = 0f
     val amp = Short.MAX_VALUE / 2
     private var phase = 0.0
 
-    fun getNextSamples(numSamples: Int): ShortArray {
+    override fun getNextSamples(numSamples: Int): ShortArray {
         if (frequency == 0f) {
             phase = 0.0
             return ShortArray(numSamples * 2)

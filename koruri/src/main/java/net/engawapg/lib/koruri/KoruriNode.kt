@@ -1,10 +1,26 @@
 package net.engawapg.lib.koruri
 
+import net.engawapg.lib.koruri.modifier.AudioModifier
+import net.engawapg.lib.koruri.modifier.KoruriModifier
+
 internal class KoruriNode {
-    var frequency = 0.0f
     val children = ArrayList<KoruriNode>()
 
-    fun calcFrequency(): Float = children.lastOrNull {
-        it.calcFrequency() > 0.1f
-    } ?.frequency ?: frequency
+    private val endBlock: AudioBlock = EndBlock(this)
+    var startBlock: AudioBlock = endBlock
+        private set
+
+    fun setModifier(modifier: KoruriModifier) {
+        startBlock = modifier.foldOut(endBlock) { element, nextBlock ->
+            var nextBlock = nextBlock
+            if (element is AudioModifier) {
+                nextBlock = AudioBlockImpl(element, nextBlock)
+            }
+            nextBlock
+        }
+    }
+
+    fun getNextSamples(numSamples: Int): ShortArray {
+        return startBlock.getNextSamples(numSamples)
+    }
 }

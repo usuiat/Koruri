@@ -13,7 +13,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.engawapg.lib.koruri.audio.KoruriAudio
-import net.engawapg.lib.koruri.audio.SineWaveGenerator
 import kotlin.coroutines.CoroutineContext
 
 fun runKoruri(content: @Composable () -> Unit) {
@@ -50,7 +49,6 @@ private class Koruri(coroutineContext: CoroutineContext) {
     private val clock = checkNotNull(coroutineContext[MonotonicFrameClock]) {
         "MonotonicFrameClock is required in the coroutine context"
     }
-    private val sineWaveGenerator = SineWaveGenerator()
     private var updated = true
     val applier = KoruriApplier(
         root = KoruriNode(),
@@ -69,7 +67,6 @@ private class Koruri(coroutineContext: CoroutineContext) {
                 clock.withFrameNanos {
                     if (updated) {
                         updated = false
-                        sineWaveGenerator.frequency = applier.root.calcFrequency()
                     }
                 }
             }
@@ -84,6 +81,6 @@ private class Koruri(coroutineContext: CoroutineContext) {
     }
 
     fun getNextSamples(numSamples: Int): ShortArray {
-        return sineWaveGenerator.getNextSamples(numSamples)
+        return applier.root.getNextSamples(numSamples)
     }
 }
