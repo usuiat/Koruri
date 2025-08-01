@@ -4,14 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
 import net.engawapg.lib.koruri.KoruriApplier
 import net.engawapg.lib.koruri.KoruriNode
-import net.engawapg.lib.koruri.modifier.KoruriModifier
+import net.engawapg.lib.koruri.SignalProcessor
 
 @Composable
-internal fun Block(modifier: KoruriModifier = KoruriModifier) {
+internal fun Block(signalProcessor: SignalProcessor) {
     ComposeNode<KoruriNode, KoruriApplier>(
         factory = ::KoruriNode,
         update = {
-            set(modifier) { setModifier(modifier) }
+            set(signalProcessor) { setProcessor(signalProcessor) }
         }
     )
 }

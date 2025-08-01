@@ -1,26 +1,20 @@
 package net.engawapg.lib.koruri
 
-import net.engawapg.lib.koruri.modifier.AudioModifier
-import net.engawapg.lib.koruri.modifier.KoruriModifier
-
 internal class KoruriNode {
     val children = ArrayList<KoruriNode>()
 
-    private val endBlock: AudioBlock = EndBlock(this)
-    var startBlock: AudioBlock = endBlock
-        private set
+    private var processor: SignalProcessor = BypassProcessor()
 
-    fun setModifier(modifier: KoruriModifier) {
-        startBlock = modifier.foldOut(endBlock) { element, nextBlock ->
-            var nextBlock = nextBlock
-            if (element is AudioModifier) {
-                nextBlock = AudioBlockImpl(element, nextBlock)
-            }
-            nextBlock
-        }
+    fun setProcessor(processor: SignalProcessor) {
+        this.processor = processor
     }
 
     fun getNextSamples(numSamples: Int): ShortArray {
-        return startBlock.getNextSamples(numSamples)
+        var signal = ShortArray(numSamples * 2)
+        for (child in children) {
+            signal = child.processor.process(signal)
+        }
+        signal = processor.process(signal)
+        return signal
     }
 }
