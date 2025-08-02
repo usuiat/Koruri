@@ -29,12 +29,12 @@ fun runKoruri(content: @Composable () -> Unit) {
             while (true) {
                 val nano = System.nanoTime()
                 clock.sendFrame(nano)
-                delay(10)
+                delay(1)
             }
         }
         launch {
             withContext(Dispatchers.IO) {
-                val bufferSize = 1024
+                val bufferSize = 48
                 while (true) {
                     val buffer = koruri.getNextSamples(bufferSize)
                     audio.write(buffer, bufferSize * 2)
