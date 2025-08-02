@@ -8,7 +8,7 @@ internal class KoruriAudio {
     companion object {
         private const val SAMPLE_RATE = 48000
         private const val CHANNEL_OUT = AudioFormat.CHANNEL_OUT_STEREO
-        private const val ENCODING = AudioFormat.ENCODING_PCM_16BIT
+        private const val ENCODING = AudioFormat.ENCODING_PCM_FLOAT
     }
 
     private var audioTrack: AudioTrack? = null
@@ -36,7 +36,7 @@ internal class KoruriAudio {
             .apply { play() }
     }
 
-    fun write(data: ShortArray, size: Int) {
-        audioTrack?.write(data, 0, size)
+    fun write(data: FloatArray, size: Int) {
+        audioTrack?.write(data, 0, size, AudioTrack.WRITE_BLOCKING)
     }
 }

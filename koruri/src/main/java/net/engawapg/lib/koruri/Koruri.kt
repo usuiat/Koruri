@@ -80,7 +80,7 @@ private class Koruri(coroutineContext: CoroutineContext) {
         composition.setContent(content)
     }
 
-    fun getNextSamples(numSamples: Int): ShortArray {
+    fun getNextSamples(numSamples: Int): FloatArray {
         return applier.root.getNextSamples(numSamples)
     }
 }
