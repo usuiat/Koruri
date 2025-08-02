@@ -8,10 +8,11 @@ fun Gain(gain: Float) {
     Block(GainProcessor(gain))
 }
 
-private class GainProcessor(private val gain: Float) : SignalProcessor {
-    override fun process(signal: FloatArray) {
-        for (i in signal.indices) {
-            signal[i] *= gain
+private class GainProcessor(private val gain: Float) : TransformProcessor {
+    override fun process(input: FloatArray): FloatArray {
+        for (i in input.indices) {
+            input[i] *= gain
         }
+        return input
     }
 }

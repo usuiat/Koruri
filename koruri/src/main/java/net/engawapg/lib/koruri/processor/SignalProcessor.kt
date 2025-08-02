@@ -1,9 +1,13 @@
 package net.engawapg.lib.koruri.processor
 
-internal interface SignalProcessor {
-    fun process(signal: FloatArray)
+import net.engawapg.lib.koruri.KoruriNode
+
+internal sealed interface SignalProcessor
+
+internal interface TransformProcessor : SignalProcessor {
+    fun process(input: FloatArray): FloatArray
 }
 
-internal class BypassProcessor : SignalProcessor {
-    override fun process(signal: FloatArray) {}
+internal interface CompositeProcessor : SignalProcessor {
+    fun process(input: FloatArray, childrenNode: List<KoruriNode>): FloatArray
 }

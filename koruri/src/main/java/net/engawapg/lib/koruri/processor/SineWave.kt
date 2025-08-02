@@ -12,26 +12,27 @@ fun SineWave(frequency: Float) {
 
 private class SineWaveGenerator(
     private val frequency: Float,
-) : SignalProcessor {
+) : TransformProcessor {
     private val sampleRate = 48000
     val amp = 1.0f
     private var phase = 0.0f
 
-    override fun process(signal: FloatArray) {
-        val numSamples = signal.size / 2
+    override fun process(input: FloatArray): FloatArray {
+        val numSamples = input.size / 2
+        val output = FloatArray(numSamples * 2)
         if (frequency == 0f) {
             phase = 0.0f
-            for (i in signal.indices) {
-                signal[i] = 0f
-            }
+            return output
         }
 
         val phaseDelta = 2.0f * PI.toFloat() * frequency / sampleRate
         for (i in 0 until numSamples) {
             val sample = sin(phase) * amp
-            signal[i * 2] = sample
-            signal[i * 2 + 1] = sample
+            output[i * 2] = sample
+            output[i * 2 + 1] = sample
             phase += phaseDelta
         }
+
+        return output
     }
 }

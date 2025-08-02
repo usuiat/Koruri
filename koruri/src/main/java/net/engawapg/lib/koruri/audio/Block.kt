@@ -15,3 +15,17 @@ internal fun Block(signalProcessor: SignalProcessor) {
         }
     )
 }
+
+@Composable
+internal fun Block(
+    content: @Composable () -> Unit,
+    signalProcessor: SignalProcessor,
+) {
+    ComposeNode<KoruriNode, KoruriApplier>(
+        factory = ::KoruriNode,
+        update = {
+            set(signalProcessor) { setProcessor(signalProcessor) }
+        },
+        content = content,
+    )
+}
