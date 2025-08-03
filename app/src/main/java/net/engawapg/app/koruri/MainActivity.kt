@@ -9,17 +9,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.delay
 import net.engawapg.app.koruri.ui.theme.KoruriTheme
-import net.engawapg.lib.koruri.processor.FMSynthesis
-import net.engawapg.lib.koruri.processor.Gain
+import net.engawapg.lib.koruri.processor.Instrument
+import net.engawapg.lib.koruri.processor.InstrumentNote
+import net.engawapg.lib.koruri.processor.Note
+import net.engawapg.lib.koruri.processor.Pitch.A5
+import net.engawapg.lib.koruri.processor.Pitch.C5
+import net.engawapg.lib.koruri.processor.Pitch.D5
+import net.engawapg.lib.koruri.processor.Pitch.E5
+import net.engawapg.lib.koruri.processor.Pitch.F5
+import net.engawapg.lib.koruri.processor.Pitch.G5
+import net.engawapg.lib.koruri.processor.Pitch.Silence
 import net.engawapg.lib.koruri.runKoruri
 
 class MainActivity : ComponentActivity() {
@@ -52,45 +56,23 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 
 @Composable
 fun KoruriSample() {
-    var gain by remember { mutableFloatStateOf(1.0f) }
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(1000L)
-            gain = if (gain == 1.0f) 0.5f else 1.0f
-        }
-    }
-    FMSynthesis(
-        carrierFrequency = C5,
-        modulatorRatio = 4.0f,
-        modulationIndex = 1.5f,
-    )
-    Gain { gain }
+    val note by melodyOfTwinkleTwinkleLittleStar()
+    InstrumentNote(note = note, instrument = Instrument.Celesta)
 }
 
-val C5 = 523.251f // C5 frequency
-val D5 = 587.330f // D5 frequency
-val E5 = 659.255f // E5 frequency
-val F5 = 698.456f // F5 frequency
-val G5 = 783.991f // G5 frequency
-val A5 = 880.000f // A5 frequency
-val B5 = 987.767f // B5 frequency
-
 @Composable
-private fun melodyOfTwinkleTwinkleLittleStar() = produceState(0f) {
-
-    val tones = listOf(
-        C5, C5, G5, G5, A5, A5, G5, 0f,
-        F5, F5, E5, E5, D5, D5, C5, 0f,
-        G5, G5, F5, F5, E5, E5, D5, 0f,
-        G5, G5, F5, F5, E5, E5, D5, 0f,
+private fun melodyOfTwinkleTwinkleLittleStar() = produceState(Note(Silence)) {
+    val pitch = listOf(
+        C5, C5, G5, G5, A5, A5, G5, Silence,
+        F5, F5, E5, E5, D5, D5, C5, Silence,
+        G5, G5, F5, F5, E5, E5, D5, Silence,
+        G5, G5, F5, F5, E5, E5, D5, Silence,
     )
     var index = 0
     while (true) {
-        value = tones[index]
+        value = Note(pitch[index])
         delay(500L)
-        value = 0f
-        delay(50L)
-        index = (index + 1) % tones.size
+        index = (index + 1) % pitch.size
     }
 }
 

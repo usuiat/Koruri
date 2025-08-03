@@ -8,13 +8,17 @@ import kotlin.math.sin
 @Composable
 fun FMSynthesis(
     carrierFrequency: Float,
-    modulatorRatio: Float,
-    modulationIndex: Float,
+    modulator: FMSynthesisModulator,
 ) {
     Block(
-        signalProcessor = FMSynthesiser(carrierFrequency, modulatorRatio, modulationIndex)
+        signalProcessor = FMSynthesiser(carrierFrequency, modulator)
     )
 }
+
+data class FMSynthesisModulator(
+    val ratio: Float,
+    val index: Float,
+)
 
 private const val PIx2 = PI.toFloat() * 2.0f
 private const val SAMPLE_RATE = 48000
@@ -22,8 +26,7 @@ private const val SAMPLE_RATE = 48000
 
 private class FMSynthesiser(
     private val carrierFrequency: Float,
-    private val modulatorRatio: Float,
-    private val modulationIndex: Float,
+    private val modulator: FMSynthesisModulator,
 ) : TransformProcessor {
     private var carrierPhase = 0.0f
     private var modulatorPhase = 0.0f
@@ -38,9 +41,9 @@ private class FMSynthesiser(
         }
 
         val phaseDelta = PIx2 * carrierFrequency / SAMPLE_RATE
-        val modulatorPhaseDelta = PIx2 * carrierFrequency * modulatorRatio / SAMPLE_RATE
+        val modulatorPhaseDelta = PIx2 * carrierFrequency * modulator.ratio / SAMPLE_RATE
         for (i in 0 until numSamples) {
-            val sample = sin(carrierPhase + modulationIndex * sin(modulatorPhase))
+            val sample = sin(carrierPhase + modulator.index * sin(modulatorPhase))
             output[i * 2] = sample
             output[i * 2 + 1] = sample
 
