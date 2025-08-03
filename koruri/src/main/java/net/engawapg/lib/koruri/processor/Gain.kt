@@ -8,10 +8,17 @@ fun Gain(gain: Float) {
     Block(GainProcessor(gain))
 }
 
-private class GainProcessor(private val gain: Float) : TransformProcessor {
+@Composable
+fun Gain(gain: () -> Float) {
+    Block(GainProcessor(gain))
+}
+
+private class GainProcessor(private val gain: () -> Float) : TransformProcessor {
+    constructor(gainValue: Float) : this({ gainValue })
     override fun process(input: FloatArray): FloatArray {
+        val g = gain()
         for (i in input.indices) {
-            input[i] *= gain
+            input[i] *= g
         }
         return input
     }

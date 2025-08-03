@@ -9,12 +9,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.delay
 import net.engawapg.app.koruri.ui.theme.KoruriTheme
 import net.engawapg.lib.koruri.processor.FMSynthesis
+import net.engawapg.lib.koruri.processor.Gain
 import net.engawapg.lib.koruri.runKoruri
 
 class MainActivity : ComponentActivity() {
@@ -47,23 +52,31 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 
 @Composable
 fun KoruriSample() {
-    val frequency by melodyOfTwinkleTwinkleLittleStar()
+    var gain by remember { mutableFloatStateOf(1.0f) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(1000L)
+            gain = if (gain == 1.0f) 0.5f else 1.0f
+        }
+    }
     FMSynthesis(
-        carrierFrequency = frequency,
+        carrierFrequency = C5,
         modulatorRatio = 4.0f,
         modulationIndex = 1.5f,
     )
+    Gain { gain }
 }
+
+val C5 = 523.251f // C5 frequency
+val D5 = 587.330f // D5 frequency
+val E5 = 659.255f // E5 frequency
+val F5 = 698.456f // F5 frequency
+val G5 = 783.991f // G5 frequency
+val A5 = 880.000f // A5 frequency
+val B5 = 987.767f // B5 frequency
 
 @Composable
 private fun melodyOfTwinkleTwinkleLittleStar() = produceState(0f) {
-    val C5 = 523.251f // C5 frequency
-    val D5 = 587.330f // D5 frequency
-    val E5 = 659.255f // E5 frequency
-    val F5 = 698.456f // F5 frequency
-    val G5 = 783.991f // G5 frequency
-    val A5 = 880.000f // A5 frequency
-    val B5 = 987.767f // B5 frequency
 
     val tones = listOf(
         C5, C5, G5, G5, A5, A5, G5, 0f,
