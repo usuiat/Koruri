@@ -3,61 +3,50 @@ package net.engawapg.lib.koruri
 import androidx.compose.runtime.BroadcastFrameClock
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
-import androidx.compose.runtime.MonotonicFrameClock
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Recomposer
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.Snapshot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.engawapg.lib.koruri.audio.KoruriAudio
-import kotlin.coroutines.CoroutineContext
 
-fun runKoruri(content: @Composable () -> Unit) {
-    val clock = BroadcastFrameClock()
-    val job = Job()
-    val koruri = Koruri(clock + job)
+@Composable
+fun KoruriContent(content: @Composable () -> Unit) {
+    val koruri = remember { Koruri() }
     koruri.setContent(content)
 
-    val audio = KoruriAudio().apply { start() }
-
-    val scope = CoroutineScope(clock + job)
-    scope.launch {
-        launch {
-            while (true) {
-                val nano = System.nanoTime()
-                clock.sendFrame(nano)
-                delay(1)
-            }
-        }
-        launch {
-            withContext(Dispatchers.IO) {
-                val bufferSize = 48
-                while (true) {
-                    val buffer = koruri.getNextSamples(bufferSize)
-                    audio.write(buffer, bufferSize * 2)
-                }
-            }
+    DisposableEffect(Unit) {
+        onDispose {
+            koruri.dispose()
         }
     }
 }
 
-private class Koruri(coroutineContext: CoroutineContext) {
-    private val coroutineScope = CoroutineScope(coroutineContext)
-    private val clock = checkNotNull(coroutineContext[MonotonicFrameClock]) {
-        "MonotonicFrameClock is required in the coroutine context"
-    }
+fun runKoruri(content: @Composable () -> Unit) {
+    val koruri = Koruri()
+    koruri.setContent(content)
+}
+
+private class Koruri() {
+    val clock = BroadcastFrameClock()
+    private val coroutineScope = CoroutineScope(clock)
     private var updated = true
     val applier = KoruriApplier(
         root = KoruriNode(),
         onChange = { updated = true },
     )
-    val recomposer = Recomposer(coroutineContext)
+    val recomposer = Recomposer(clock)
     val composition = Composition(applier, recomposer)
+    val audio = KoruriAudio()
 
     init {
+        audio.start()
+
         Snapshot.registerApplyObserver { _, _ ->
             updated = true
         }
@@ -74,13 +63,30 @@ private class Koruri(coroutineContext: CoroutineContext) {
         coroutineScope.launch {
             recomposer.runRecomposeAndApplyChanges()
         }
+        coroutineScope.launch {
+            while (true) {
+                clock.sendFrame(System.nanoTime())
+                delay(1)
+            }
+        }
+        coroutineScope.launch {
+            withContext(Dispatchers.IO) {
+                val numSamples = 48
+                while (true) {
+                    val buffer = applier.root.getNextSamples(numSamples)
+                    audio.write(data = buffer, size = numSamples * 2)
+                }
+            }
+        }
     }
 
     fun setContent(content: @Composable () -> Unit) {
         composition.setContent(content)
     }
 
-    fun getNextSamples(numSamples: Int): FloatArray {
-        return applier.root.getNextSamples(numSamples)
+    fun dispose() {
+        composition.dispose()
+        recomposer.close()
+        coroutineScope.cancel()
     }
 }

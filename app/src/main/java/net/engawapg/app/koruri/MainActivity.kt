@@ -4,16 +4,21 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.delay
 import net.engawapg.app.koruri.ui.theme.KoruriTheme
+import net.engawapg.lib.koruri.KoruriContent
 import net.engawapg.lib.koruri.processor.Instrument
 import net.engawapg.lib.koruri.processor.InstrumentNote
 import net.engawapg.lib.koruri.processor.Note
@@ -24,7 +29,6 @@ import net.engawapg.lib.koruri.processor.Pitch.E5
 import net.engawapg.lib.koruri.processor.Pitch.F5
 import net.engawapg.lib.koruri.processor.Pitch.G5
 import net.engawapg.lib.koruri.processor.Pitch.Silence
-import net.engawapg.lib.koruri.runKoruri
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,25 +37,26 @@ class MainActivity : ComponentActivity() {
         setContent {
             KoruriTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    var play by remember { mutableStateOf(false) }
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
+                    ) {
+                        Switch(
+                            checked = play,
+                            onCheckedChange = { play = it },
+                        )
+                    }
+                    KoruriContent {
+                        if (play) {
+                            KoruriSample()
+                        }
+                    }
                 }
             }
         }
-        runKoruri {
-            KoruriSample()
-        }
     }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
 }
 
 @Composable
