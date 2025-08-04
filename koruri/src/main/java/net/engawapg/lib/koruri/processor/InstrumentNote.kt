@@ -17,20 +17,22 @@ fun InstrumentNote(
     note: Note,
     instrument: Instrument,
 ) {
-    FMSynthesis(
-        carrierFrequency = note.pitch.frequency,
-        modulator = instrument.modulator,
-    )
-
-    var volume = remember { Animatable(1f) }
-    LaunchedEffect(note.id) {
-        volume.snapTo(1f)
-        volume.animateTo(
-            targetValue = 0f,
-            animationSpec = instrument.envelopeSpec,
+    Chain {
+        FMSynthesis(
+            carrierFrequency = note.pitch.frequency,
+            modulator = instrument.modulator,
         )
+
+        var volume = remember { Animatable(1f) }
+        LaunchedEffect(note.id) {
+            volume.snapTo(1f)
+            volume.animateTo(
+                targetValue = 0f,
+                animationSpec = instrument.envelopeSpec,
+            )
+        }
+        Gain { volume.value }
     }
-    Gain { volume.value }
 }
 
 class Note(
