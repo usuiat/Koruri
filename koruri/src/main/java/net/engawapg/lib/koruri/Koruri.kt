@@ -34,7 +34,7 @@ fun runKoruri(content: @Composable () -> Unit) {
 
 private class Koruri() {
     val clock = BroadcastFrameClock()
-    private val coroutineScope = CoroutineScope(clock)
+    private val coroutineScope = CoroutineScope(clock + Dispatchers.Main)
     private var updated = true
     val applier = KoruriApplier(
         root = KoruriNode(),
