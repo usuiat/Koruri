@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import kotlinx.coroutines.delay
 import net.engawapg.app.koruri.ui.theme.KoruriTheme
 import net.engawapg.lib.koruri.KoruriContent
+import net.engawapg.lib.koruri.processor.Gain
 import net.engawapg.lib.koruri.processor.Instrument
 import net.engawapg.lib.koruri.processor.InstrumentNote
 import net.engawapg.lib.koruri.processor.Mix
@@ -66,10 +67,11 @@ class MainActivity : ComponentActivity() {
 fun KoruriSample() {
     Mix {
         val note by melodyOfTwinkleTwinkleLittleStar()
-        InstrumentNote(note = note, instrument = Instrument.Celesta)
+        InstrumentNote(note = note, instrument = Instrument.ElectricPiano)
         val accompaniment by accompanimentOfTwinkleTwinkleLittleStar()
-        InstrumentNote(note = accompaniment, instrument = Instrument.Celesta)
+        InstrumentNote(note = accompaniment, instrument = Instrument.SoftPad)
     }
+    Gain(0.5f)
 }
 
 @Composable

@@ -52,7 +52,40 @@ data class Instrument(
                 index = 1.5f,
             ),
             envelopeSpec = tween(
-                durationMillis = 1000,
+                durationMillis = 4000,
+                delayMillis = 200,
+                easing = EaseOutExpo
+            )
+        )
+        val ElectricPiano = Instrument(
+            modulator = FMSynthesisModulator(
+                ratio = 1.0f,
+                index = 0.5f,
+            ),
+            envelopeSpec = tween(
+                durationMillis = 2000,
+                delayMillis = 200,
+                easing = EaseOutExpo
+            )
+        )
+        val SoftPad = Instrument(
+            modulator = FMSynthesisModulator(
+                ratio = 0.5f,
+                index = 1.0f,
+            ),
+            envelopeSpec = tween(
+                durationMillis = 2000,
+                delayMillis = 200,
+                easing = EaseOutExpo
+            )
+        )
+        val CrystalBell = Instrument(
+            modulator = FMSynthesisModulator(
+                ratio = 7f,
+                index = 1f,
+            ),
+            envelopeSpec = tween(
+                durationMillis = 2000,
                 delayMillis = 200,
                 easing = EaseOutExpo
             )
