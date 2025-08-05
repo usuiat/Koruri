@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +24,7 @@ import net.engawapg.lib.koruri.processor.Volume
 import net.engawapg.lib.koruri.processor.Instrument
 import net.engawapg.lib.koruri.processor.InstrumentNote
 import net.engawapg.lib.koruri.processor.Mix
+import net.engawapg.lib.koruri.processor.Mute
 import net.engawapg.lib.koruri.processor.Note
 import net.engawapg.lib.koruri.processor.Pitch.*
 import net.engawapg.lib.koruri.processor.Pitch.A5
@@ -41,20 +43,28 @@ class MainActivity : ComponentActivity() {
             KoruriTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     var play by remember { mutableStateOf(false) }
+                    var muted by remember { mutableStateOf(false) }
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding)
                     ) {
+                        Text("Play")
                         Switch(
                             checked = play,
                             onCheckedChange = { play = it },
+                        )
+                        Text("Mute")
+                        Switch(
+                            checked = muted,
+                            onCheckedChange = { muted = it },
                         )
                     }
                     KoruriContent {
                         if (play) {
                             KoruriSample()
                         }
+                        Mute(muted)
                     }
                 }
             }
