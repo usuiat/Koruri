@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import kotlinx.coroutines.delay
 import net.engawapg.app.koruri.ui.theme.KoruriTheme
 import net.engawapg.lib.koruri.KoruriContent
-import net.engawapg.lib.koruri.processor.Gain
+import net.engawapg.lib.koruri.processor.Volume
 import net.engawapg.lib.koruri.processor.Instrument
 import net.engawapg.lib.koruri.processor.InstrumentNote
 import net.engawapg.lib.koruri.processor.Mix
@@ -32,7 +32,6 @@ import net.engawapg.lib.koruri.processor.Pitch.E5
 import net.engawapg.lib.koruri.processor.Pitch.F5
 import net.engawapg.lib.koruri.processor.Pitch.G5
 import net.engawapg.lib.koruri.processor.Pitch.Silence
-import net.engawapg.lib.koruri.processor.SineWave
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,7 +70,7 @@ fun KoruriSample() {
         val accompaniment by accompanimentOfTwinkleTwinkleLittleStar()
         InstrumentNote(note = accompaniment, instrument = Instrument.SoftPad)
     }
-    Gain(0.5f)
+    Volume(0.5f)
 }
 
 @Composable

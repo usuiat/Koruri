@@ -31,7 +31,7 @@ fun InstrumentNote(
                 animationSpec = instrument.envelopeSpec,
             )
         }
-        Gain { volume.value }
+        Volume { volume.value }
     }
 }
 
