@@ -39,6 +39,9 @@ class Note(
     val pitch: Pitch,
 ) {
     val id = Uuid.random()
+    companion object {
+        val Silence = Note(Pitch.Silence)
+    }
 }
 
 data class Instrument(

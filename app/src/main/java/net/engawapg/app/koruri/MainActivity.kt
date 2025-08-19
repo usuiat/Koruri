@@ -4,10 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,32 +43,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            Box {  }
             KoruriTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    var play by remember { mutableStateOf(false) }
-                    var muted by remember { mutableStateOf(false) }
-                    Column(
+                    Keyboard(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding)
-                    ) {
-                        Text("Play")
-                        Switch(
-                            checked = play,
-                            onCheckedChange = { play = it },
-                        )
-                        Text("Mute")
-                        Switch(
-                            checked = muted,
-                            onCheckedChange = { muted = it },
-                        )
-                    }
-                    KoruriContent {
-                        if (play) {
-                            KoruriSample()
-                        }
-                        Mute(muted)
-                    }
+                    )
                 }
             }
         }
