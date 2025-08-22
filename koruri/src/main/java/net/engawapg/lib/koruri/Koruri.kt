@@ -34,9 +34,8 @@ fun setKoruriContent(content: @Composable () -> Unit) {
 private class Koruri() {
     val clock = BroadcastFrameClock()
     private val coroutineScope = CoroutineScope(clock + Dispatchers.Main)
-    val applier = KoruriApplier(
-        root = KoruriNode(),
-    )
+    val rootNode = KoruriNode()
+    val applier = KoruriApplier(rootNode)
     val recomposer = Recomposer(clock)
     val composition = Composition(applier, recomposer)
     val audio = KoruriAudio()
@@ -56,7 +55,7 @@ private class Koruri() {
         coroutineScope.launch {
             val numSamples = 48
             while (true) {
-                val buffer = applier.root.getNextSamples(numSamples)
+                val buffer = rootNode.getNextSamples(numSamples)
                 withContext(Dispatchers.IO) {
                     audio.write(data = buffer, size = numSamples * 2)
                 }
