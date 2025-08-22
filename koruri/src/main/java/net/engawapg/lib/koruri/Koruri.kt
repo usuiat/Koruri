@@ -6,7 +6,6 @@ import androidx.compose.runtime.Composition
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshots.Snapshot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -35,10 +34,8 @@ fun runKoruri(content: @Composable () -> Unit) {
 private class Koruri() {
     val clock = BroadcastFrameClock()
     private val coroutineScope = CoroutineScope(clock + Dispatchers.Main)
-    private var updated = true
     val applier = KoruriApplier(
         root = KoruriNode(),
-        onChange = { updated = true },
     )
     val recomposer = Recomposer(clock)
     val composition = Composition(applier, recomposer)
@@ -47,19 +44,6 @@ private class Koruri() {
     init {
         audio.start()
 
-        Snapshot.registerApplyObserver { _, _ ->
-            updated = true
-        }
-
-        coroutineScope.launch {
-            while (true) {
-                clock.withFrameNanos {
-                    if (updated) {
-                        updated = false
-                    }
-                }
-            }
-        }
         coroutineScope.launch {
             recomposer.runRecomposeAndApplyChanges()
         }
