@@ -57,7 +57,12 @@ private class Koruri() {
             while (true) {
                 val samples = rootNode.getNextSamples(numSamples)
                 withContext(Dispatchers.IO) {
-                    audio.write(data = samples, size = numSamples * 2)
+                    val data = FloatArray(numSamples * 2)
+                    for (i in 0 until numSamples) {
+                        data[i * 2] = samples[i]
+                        data[i * 2 + 1] = samples[i]
+                    }
+                    audio.write(data = data, size = data.size)
                 }
             }
         }

@@ -22,18 +22,15 @@ private class SineWaveGenerator(
     private var phase = 0.0f
 
     override fun process(input: FloatArray, childrenNode: List<KoruriNode>): FloatArray {
-        val numSamples = input.size / 2
-        val output = FloatArray(numSamples * 2)
+        val output = FloatArray(input.size)
         if (frequency == 0f) {
             phase = 0.0f
             return output
         }
 
         val phaseDelta = PIx2 * frequency / sampleRate
-        for (i in 0 until numSamples) {
-            val sample = sin(phase) * amp
-            output[i * 2] = sample
-            output[i * 2 + 1] = sample
+        for (i in 0 until input.size) {
+            output[i] = sin(phase) * amp
             phase += phaseDelta
             // phase を 2π の範囲内に正規化
             if (phase >= PIx2) {

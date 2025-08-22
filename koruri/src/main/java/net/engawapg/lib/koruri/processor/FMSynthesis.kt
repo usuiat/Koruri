@@ -33,8 +33,7 @@ private class FMSynthesiser(
     private var modulatorPhase = 0.0f
 
     override fun process(input: FloatArray, childrenNode: List<KoruriNode>): FloatArray {
-        val numSamples = input.size / 2
-        val output = FloatArray(numSamples * 2)
+        val output = FloatArray(input.size)
         if (carrierFrequency == 0f) {
             carrierPhase = 0.0f
             modulatorPhase = 0.0f
@@ -43,10 +42,8 @@ private class FMSynthesiser(
 
         val phaseDelta = PIx2 * carrierFrequency / SAMPLE_RATE
         val modulatorPhaseDelta = PIx2 * carrierFrequency * modulator.ratio / SAMPLE_RATE
-        for (i in 0 until numSamples) {
-            val sample = sin(carrierPhase + modulator.index * sin(modulatorPhase))
-            output[i * 2] = sample
-            output[i * 2 + 1] = sample
+        for (i in 0 until input.size) {
+            output[i] = sin(carrierPhase + modulator.index * sin(modulatorPhase))
 
             carrierPhase += phaseDelta
             // phase を 2π の範囲内に正規化
