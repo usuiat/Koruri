@@ -26,7 +26,7 @@ fun KoruriContent(content: @Composable () -> Unit) {
     }
 }
 
-fun runKoruri(content: @Composable () -> Unit) {
+fun setKoruriContent(content: @Composable () -> Unit) {
     val koruri = Koruri()
     koruri.setContent(content)
 }
