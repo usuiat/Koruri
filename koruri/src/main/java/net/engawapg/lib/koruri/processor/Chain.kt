@@ -9,7 +9,7 @@ fun Chain(content: @Composable () -> Unit) {
     Block(content = content, signalProcessor = ChainProcessor())
 }
 
-internal class ChainProcessor : CompositeProcessor {
+internal class ChainProcessor : SignalProcessor {
     override fun process(input: FloatArray, childrenNode: List<KoruriNode>): FloatArray {
         var signal = input
         for (node in childrenNode) {

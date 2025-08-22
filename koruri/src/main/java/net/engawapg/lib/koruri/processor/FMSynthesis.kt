@@ -1,6 +1,7 @@
 package net.engawapg.lib.koruri.processor
 
 import androidx.compose.runtime.Composable
+import net.engawapg.lib.koruri.KoruriNode
 import net.engawapg.lib.koruri.audio.Block
 import kotlin.math.PI
 import kotlin.math.sin
@@ -27,11 +28,11 @@ private const val SAMPLE_RATE = 48000
 private class FMSynthesiser(
     private val carrierFrequency: Float,
     private val modulator: FMSynthesisModulator,
-) : TransformProcessor {
+) : SignalProcessor {
     private var carrierPhase = 0.0f
     private var modulatorPhase = 0.0f
 
-    override fun process(input: FloatArray): FloatArray {
+    override fun process(input: FloatArray, childrenNode: List<KoruriNode>): FloatArray {
         val numSamples = input.size / 2
         val output = FloatArray(numSamples * 2)
         if (carrierFrequency == 0f) {

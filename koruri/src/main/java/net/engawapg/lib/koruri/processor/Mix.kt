@@ -9,7 +9,7 @@ fun Mix(content: @Composable () -> Unit) {
     Block(content = content, signalProcessor = MixProcessor())
 }
 
-private class MixProcessor : CompositeProcessor {
+private class MixProcessor : SignalProcessor {
     override fun process(input: FloatArray, childrenNode: List<KoruriNode>): FloatArray {
         val size = input.size
         val mixedSignal = FloatArray(size)
