@@ -2,13 +2,14 @@ package net.engawapg.lib.koruri.audio
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
+import androidx.compose.runtime.ReusableComposeNode
 import net.engawapg.lib.koruri.KoruriApplier
 import net.engawapg.lib.koruri.KoruriNode
 import net.engawapg.lib.koruri.processor.SignalProcessor
 
 @Composable
 internal fun Block(signalProcessor: SignalProcessor) {
-    ComposeNode<KoruriNode, KoruriApplier>(
+    ReusableComposeNode<KoruriNode, KoruriApplier>(
         factory = ::KoruriNode,
         update = {
             set(signalProcessor) { setProcessor(signalProcessor) }
@@ -21,7 +22,7 @@ internal fun Block(
     content: @Composable () -> Unit,
     signalProcessor: SignalProcessor,
 ) {
-    ComposeNode<KoruriNode, KoruriApplier>(
+    ReusableComposeNode<KoruriNode, KoruriApplier>(
         factory = ::KoruriNode,
         update = {
             set(signalProcessor) { setProcessor(signalProcessor) }
