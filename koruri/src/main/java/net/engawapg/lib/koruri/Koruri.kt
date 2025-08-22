@@ -55,9 +55,9 @@ private class Koruri() {
         coroutineScope.launch {
             val numSamples = 48
             while (true) {
-                val buffer = rootNode.getNextSamples(numSamples)
+                val samples = rootNode.getNextSamples(numSamples)
                 withContext(Dispatchers.IO) {
-                    audio.write(data = buffer, size = numSamples * 2)
+                    audio.write(data = samples, size = numSamples * 2)
                 }
             }
         }

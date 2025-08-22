@@ -13,12 +13,12 @@ internal class KoruriNode {
     }
 
     fun getNextSamples(numSamples: Int): FloatArray {
-        val input = FloatArray(numSamples * 2)
-        val output = process(input)
+        val emptyData = FloatArray(numSamples * 2)
+        val output = process(emptyData)
         return output
     }
 
-    fun process(signal: FloatArray): FloatArray {
-        return processor.process(signal, children)
+    fun process(input: FloatArray): FloatArray {
+        return processor.process(input, children)
     }
 }
