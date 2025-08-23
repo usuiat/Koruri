@@ -53,16 +53,15 @@ private class Koruri() {
             }
         }
         coroutineScope.launch {
-            val numSamples = 48
+            val buffer = FloatArray(KoruriAudioConfig.BUFFER_SIZE * 2)
             while (true) {
-                val samples = rootNode.getNextSamples(numSamples)
+                val samples = rootNode.getNextSamples(KoruriAudioConfig.BUFFER_SIZE)
                 withContext(Dispatchers.IO) {
-                    val data = FloatArray(numSamples * 2)
-                    for (i in 0 until numSamples) {
-                        data[i * 2] = samples[i]
-                        data[i * 2 + 1] = samples[i]
+                    for (i in 0 until KoruriAudioConfig.BUFFER_SIZE) {
+                        buffer[i * 2] = samples[i]
+                        buffer[i * 2 + 1] = samples[i]
                     }
-                    audio.write(data = data, size = data.size)
+                    audio.write(data = buffer, size = buffer.size)
                 }
             }
         }
