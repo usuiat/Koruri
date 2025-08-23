@@ -16,6 +16,7 @@ import kotlin.uuid.Uuid
 fun InstrumentNote(
     note: Note,
     instrument: Instrument,
+    amplitude: Float = 0.5f,
 ) {
     Chain {
         FMSynthesis(
@@ -23,9 +24,9 @@ fun InstrumentNote(
             modulator = instrument.modulator,
         )
 
-        var volume = remember { Animatable(1f) }
+        val volume = remember { Animatable(amplitude) }
         LaunchedEffect(note.id) {
-            volume.snapTo(1f)
+            volume.snapTo(amplitude)
             volume.animateTo(
                 targetValue = 0f,
                 animationSpec = instrument.envelopeSpec,
