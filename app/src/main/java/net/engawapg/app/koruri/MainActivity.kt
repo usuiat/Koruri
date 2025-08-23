@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -55,6 +56,9 @@ class MainActivity : ComponentActivity() {
                     composable<Sample.VariableSineWave> {
                         VariableSineWaveScreen()
                     }
+                    composable<Sample.Instruments> {
+                        InstrumentsScreen()
+                    }
                 }
             }
         }
@@ -68,7 +72,7 @@ private fun MainScreen(
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier
                 .fillMaxSize()
@@ -81,6 +85,11 @@ private fun MainScreen(
             ) {
                 Text("Variable Sine Wave")
             }
+            Button(
+                onClick = { onSampleSelect(Sample.Instruments) },
+            ) {
+                Text("Instruments")
+            }
         }
     }
 }
@@ -88,6 +97,8 @@ private fun MainScreen(
 private sealed interface Sample {
     @Serializable
     data object VariableSineWave: Sample
+    @Serializable
+    data object Instruments: Sample
 }
 
 @Composable
