@@ -1,5 +1,7 @@
 package net.engawapg.app.koruri
 
+import android.content.pm.ActivityInfo
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -11,8 +13,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,15 +33,24 @@ import net.engawapg.lib.koruri.processor.Note
 import net.engawapg.lib.koruri.processor.Pitch
 
 @Composable
-fun Keyboard(modifier: Modifier = Modifier) {
+fun KeyboardScreen(modifier: Modifier = Modifier) {
+    val activity = LocalActivity.current
+    DisposableEffect(Unit) {
+        val originalOrientation = activity?.requestedOrientation
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        onDispose {
+            activity?.requestedOrientation = originalOrientation ?: ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
+    }
+
     var note by remember { mutableStateOf(Note.Silence) }
     KeyboardUi(
         modifier = modifier.fillMaxSize(),
         onNoteSelect = { note = it }
     )
-    KeyboardAudio(
-        note = note,
-    )
+    KoruriContent {
+        InstrumentNote(note = note, instrument = Instrument.ElectricPiano)
+    }
 }
 
 @Composable
@@ -46,42 +58,47 @@ private fun KeyboardUi(
     modifier: Modifier = Modifier,
     onNoteSelect: (Note) -> Unit,
 ) {
-    val whiteKeys = listOf(
-        Pitch.C5, Pitch.D5, Pitch.E5, Pitch.F5, Pitch.G5, Pitch.A5, Pitch.B5,
-        Pitch.C6, Pitch.D6, Pitch.E6
-    )
-    val blackKeys = listOf(
-        Pitch.Cs5, Pitch.Ds5, null, Pitch.Fs5, Pitch.Gs5, Pitch.As5,
-        null, Pitch.Cs6, Pitch.Ds6
-    )
-    Box(modifier = modifier.background(Color(0xFFEEEEEE))) {
-        Text("")
-        // White keys
-        Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.Bottom) {
-            whiteKeys.forEach{ pitch ->
-                WhiteKey(
-                    pitch = pitch,
-                    onNoteSelect = onNoteSelect,
-                    modifier = Modifier.weight(1f)
-                )
-            }
-        }
-        // Black keys
-        Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.Top) {
-            Spacer(Modifier.weight(1.1f))
-            blackKeys.forEach{ pitch ->
-                if (pitch != null) {
-                    BlackKey(
+    Scaffold(modifier = modifier) { innerPadding ->
+        val whiteKeys = listOf(
+            Pitch.C5, Pitch.D5, Pitch.E5, Pitch.F5, Pitch.G5, Pitch.A5, Pitch.B5,
+            Pitch.C6, Pitch.D6, Pitch.E6
+        )
+        val blackKeys = listOf(
+            Pitch.Cs5, Pitch.Ds5, null, Pitch.Fs5, Pitch.Gs5, Pitch.As5,
+            null, Pitch.Cs6, Pitch.Ds6
+        )
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .background(Color(0xFFEEEEEE))
+        ) {
+            // White keys
+            Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.Bottom) {
+                whiteKeys.forEach { pitch ->
+                    WhiteKey(
                         pitch = pitch,
                         onNoteSelect = onNoteSelect,
-                        modifier = Modifier.weight(0.6f)
+                        modifier = Modifier.weight(1f)
                     )
-                } else {
-                    Spacer(Modifier.weight(0.6f))
                 }
-                Spacer(Modifier.weight(0.8f))
             }
-            Spacer(Modifier.weight(0.3f))
+            // Black keys
+            Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.Top) {
+                Spacer(Modifier.weight(1.1f))
+                blackKeys.forEach { pitch ->
+                    if (pitch != null) {
+                        BlackKey(
+                            pitch = pitch,
+                            onNoteSelect = onNoteSelect,
+                            modifier = Modifier.weight(0.6f)
+                        )
+                    } else {
+                        Spacer(Modifier.weight(0.6f))
+                    }
+                    Spacer(Modifier.weight(0.8f))
+                }
+                Spacer(Modifier.weight(0.3f))
+            }
         }
     }
 }
@@ -133,15 +150,6 @@ private fun BlackKey(
                 )
             }
     )
-}
-
-@Composable
-private fun KeyboardAudio(
-    note: Note,
-) {
-    KoruriContent {
-        InstrumentNote(note = note, instrument = Instrument.ElectricPiano)
-    }
 }
 
 @Preview(showBackground = true, widthDp = 400, heightDp = 120)

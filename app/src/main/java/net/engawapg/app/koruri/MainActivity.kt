@@ -46,6 +46,9 @@ class MainActivity : ComponentActivity() {
                     composable<Sample.Twinkle> {
                         TwinkleScreen()
                     }
+                    composable<Sample.Keyboard> {
+                        KeyboardScreen()
+                    }
                 }
             }
         }
@@ -82,6 +85,11 @@ private fun MainScreen(
             ) {
                 Text("Twinkle Twinkle Little Star")
             }
+            Button(
+                onClick = { onSampleSelect(Sample.Keyboard) },
+            ) {
+                Text("Keyboard")
+            }
         }
     }
 }
@@ -93,4 +101,6 @@ private sealed interface Sample {
     data object Instruments: Sample
     @Serializable
     data object Twinkle: Sample
+    @Serializable
+    data object Keyboard: Sample
 }
