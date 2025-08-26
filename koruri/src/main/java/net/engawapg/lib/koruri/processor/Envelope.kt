@@ -10,9 +10,11 @@ fun Envelope(
     decay: () -> Float,
     sustain: () -> Float,
     release: () -> Float,
+    content: @Composable () -> Unit
 ) {
     Block(
         signalProcessor = EnvelopeGenerator(attack, decay, sustain, release),
+        content = content
     )
 }
 
@@ -22,9 +24,11 @@ fun Envelope(
     decay: Float,
     sustain: Float,
     release: Float,
+    content: @Composable () -> Unit
 ) {
     Block(
         signalProcessor = EnvelopeGenerator({ attack }, { decay }, { sustain }, { release }),
+        content = content
     )
 }
 
@@ -42,32 +46,47 @@ private class EnvelopeGenerator(
     private var phase = Phase.Idle
     private var envelope = 0f
     private var phaseTime = 0f
-    private var isGateOn = false
     private var releaseLevel = 0f
     private val sampleRate = 48000
+    private var wasInputActive = false
+    private var storedSignal = 0f
 
     override fun process(input: FloatArray, childrenNode: List<KoruriNode>): FloatArray {
         val output = FloatArray(input.size)
         val deltaTime = 1f / sampleRate
 
-        for (i in input.indices) {
-            // Gate detection (simple trigger based on input level)
-            val currentGate = input[i] != 0f
+        // Get child signal first
+        val childOutput = if (childrenNode.isNotEmpty()) {
+            childrenNode[0].process(input)
+        } else {
+            FloatArray(input.size) // Generate silence if no child
+        }
 
-            if (currentGate && !isGateOn) {
+        for (i in input.indices) {
+            // Gate detection based on child signal
+            val hasChildSignal = childOutput[i] != 0f
+
+            if (hasChildSignal && !wasInputActive) {
                 // Gate on - start attack phase
                 phase = Phase.Attack
                 phaseTime = 0f
-                isGateOn = true
-            } else if (!currentGate && isGateOn) {
+                wasInputActive = true
+                storedSignal = childOutput[i] // Store the signal level
+            } else if (!hasChildSignal && wasInputActive && phase != Phase.Release) {
                 // Gate off - start release phase
                 phase = Phase.Release
                 phaseTime = 0f
                 releaseLevel = envelope
-                isGateOn = false
+                wasInputActive = false
+                // Keep storedSignal for release phase
             }
 
-            // Process envelope
+            // Update stored signal while input is active
+            if (hasChildSignal) {
+                storedSignal = childOutput[i]
+            }
+
+            // Process envelope phases
             when (phase) {
                 Phase.Attack -> {
                     val attackTime = attack()
@@ -127,7 +146,13 @@ private class EnvelopeGenerator(
                 }
             }
 
-            output[i] = input[i] * envelope
+            // Apply envelope - use stored signal during release phase
+            if (phase == Phase.Release) {
+                output[i] = storedSignal * envelope
+            } else {
+                output[i] = childOutput[i] * envelope
+            }
+
             phaseTime += deltaTime
         }
 

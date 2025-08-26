@@ -132,14 +132,13 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
 
     KoruriContent {
         if (isPlaying) {
-            Chain {
+            Envelope(
+                attack = { attack },
+                decay = { decay },
+                sustain = { sustain },
+                release = { release }
+            ) {
                 SquareWave { frequency }
-                Envelope(
-                    attack = { attack },
-                    decay = { decay },
-                    sustain = { sustain },
-                    release = { release }
-                )
             }
         }
     }
