@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,26 +34,38 @@ import net.engawapg.lib.koruri.processor.SquareWave
 @Composable
 internal fun SynthScreen(modifier: Modifier = Modifier) {
     var isPlaying by remember { mutableStateOf(false) }
-    var frequency by remember { mutableFloatStateOf(100f) }
+    val baseFrequency = 130.81f // C3の音に固定
     var bpm by remember { mutableFloatStateOf(120f) }
     var pulseWidth by remember { mutableFloatStateOf(0f) }
 
     var gate by remember { mutableStateOf(false) }
+    var frequency by remember { mutableFloatStateOf(130.81f) }
+
+    // アルペジオパターン（ルート、3度、5度、オクターブ）
+    val arpeggioPattern = listOf(1f, 1.25f, 1.5f, 2f)
+    var currentStep by remember { mutableIntStateOf(0) }
+
     LaunchedEffect(isPlaying, bpm) {
         if (isPlaying) {
             if (bpm == 0f) {
-                // BPM=0なら常時gate ON
+                // BPM=0なら最初の音を常時再生
+                frequency = baseFrequency * arpeggioPattern[0]
                 gate = true
             } else {
-                // 4つ打ちリズム
+                // アルペジオパターンをループ
                 while (true) {
                     val beatDuration = (60000 / bpm).toLong() // BPMからミリ秒計算
-                    val gateDuration = (beatDuration * 0.3).toLong() // 拍の30%をゲートオン
+                    val gateDuration = (beatDuration * 0.8).toLong() // 拍の80%�����ゲートオン
 
+                    // 現在のステ��プに対応する周波数を設定
+                    frequency = baseFrequency * arpeggioPattern[currentStep]
                     gate = true
                     delay(gateDuration)
                     gate = false
                     delay(beatDuration - gateDuration)
+
+                    // 次のステップに進む
+                    currentStep = (currentStep + 1) % arpeggioPattern.size
                 }
             }
         } else {
@@ -88,26 +101,6 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                 Text(if (isPlaying) "Stop" else "Play")
             }
 
-            // Frequency control
-            Card(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(
-                        text = "Frequency",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text("${"%.1f".format(frequency)} Hz")
-                    Slider(
-                        value = frequency,
-                        onValueChange = { frequency = it },
-                        valueRange = 20f..300f,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
 
             // BPM control
             Card(
