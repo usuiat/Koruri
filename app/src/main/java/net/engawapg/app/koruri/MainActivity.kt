@@ -49,6 +49,9 @@ class MainActivity : ComponentActivity() {
                     composable<Sample.Keyboard> {
                         KeyboardScreen()
                     }
+                    composable<Sample.Synth> {
+                        SynthScreen()
+                    }
                 }
             }
         }
@@ -90,6 +93,11 @@ private fun MainScreen(
             ) {
                 Text("Keyboard")
             }
+            Button(
+                onClick = { onSampleSelect(Sample.Synth) },
+            ) {
+                Text("Synthesizer")
+            }
         }
     }
 }
@@ -103,4 +111,6 @@ private sealed interface Sample {
     data object Twinkle: Sample
     @Serializable
     data object Keyboard: Sample
+    @Serializable
+    data object Synth: Sample
 }
