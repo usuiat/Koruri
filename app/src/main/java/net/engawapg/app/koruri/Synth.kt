@@ -33,6 +33,7 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
     var isPlaying by remember { mutableStateOf(false) }
     var frequency by remember { mutableFloatStateOf(100f) }
     var bpm by remember { mutableFloatStateOf(120f) }
+    var pulseWidth by remember { mutableFloatStateOf(0f) }
 
     var gate by remember { mutableStateOf(false) }
     LaunchedEffect(isPlaying, bpm) {
@@ -123,6 +124,27 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                 }
             }
 
+            // Pulse Width control
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Pulse Width",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text("${"%.2f".format(pulseWidth)}")
+                    Slider(
+                        value = pulseWidth,
+                        onValueChange = { pulseWidth = it },
+                        valueRange = -1f..1f,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
             // ADSR controls
             Card(
                 modifier = Modifier.fillMaxWidth()
@@ -184,7 +206,10 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
             release = { release },
             gate = { gate }
         ) {
-            SquareWave { frequency }
+            SquareWave(
+                frequency = { frequency },
+                pulseWidth = { pulseWidth }
+            )
         }
     }
 }
