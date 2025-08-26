@@ -5,7 +5,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
@@ -19,6 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.engawapg.lib.koruri.KoruriContent
+import net.engawapg.lib.koruri.processor.Chain
+import net.engawapg.lib.koruri.processor.Envelope
 import net.engawapg.lib.koruri.processor.SquareWave
 
 @Composable
@@ -26,33 +32,115 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
     var isPlaying by remember { mutableStateOf(false) }
     var frequency by remember { mutableFloatStateOf(1000f) }
 
+    // ADSR parameters
+    var attack by remember { mutableFloatStateOf(0.1f) }
+    var decay by remember { mutableFloatStateOf(0.2f) }
+    var sustain by remember { mutableFloatStateOf(0.7f) }
+    var release by remember { mutableFloatStateOf(0.3f) }
+
     Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
         Column(
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
         ) {
+            // Play/Stop button
             Button(
                 onClick = { isPlaying = !isPlaying },
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(if (isPlaying) "Stop" else "Play")
             }
-            Text("Frequency: ${"%.1f".format(frequency)} Hz")
-            Slider(
-                value = frequency,
-                onValueChange = { frequency = it },
-                valueRange = 200f..2000f,
-                modifier = Modifier.fillMaxWidth().padding(16.dp)
-            )
+
+            // Frequency control
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Frequency",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text("${"%.1f".format(frequency)} Hz")
+                    Slider(
+                        value = frequency,
+                        onValueChange = { frequency = it },
+                        valueRange = 200f..2000f,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
+            // ADSR controls
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "ADSR Envelope",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    // Attack
+                    Text("Attack: ${"%.2f".format(attack)}s")
+                    Slider(
+                        value = attack,
+                        onValueChange = { attack = it },
+                        valueRange = 0.01f..2.0f,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    // Decay
+                    Text("Decay: ${"%.2f".format(decay)}s")
+                    Slider(
+                        value = decay,
+                        onValueChange = { decay = it },
+                        valueRange = 0.01f..2.0f,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    // Sustain
+                    Text("Sustain: ${"%.2f".format(sustain)}")
+                    Slider(
+                        value = sustain,
+                        onValueChange = { sustain = it },
+                        valueRange = 0.0f..1.0f,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    // Release
+                    Text("Release: ${"%.2f".format(release)}s")
+                    Slider(
+                        value = release,
+                        onValueChange = { release = it },
+                        valueRange = 0.01f..3.0f,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
         }
     }
 
     KoruriContent {
         if (isPlaying) {
-            SquareWave { frequency }
+            Chain {
+                SquareWave { frequency }
+                Envelope(
+                    attack = { attack },
+                    decay = { decay },
+                    sustain = { sustain },
+                    release = { release }
+                )
+            }
         }
     }
 }
