@@ -34,12 +34,12 @@ import net.engawapg.lib.koruri.processor.SquareWave
 @Composable
 internal fun SynthScreen(modifier: Modifier = Modifier) {
     var isPlaying by remember { mutableStateOf(false) }
-    val baseFrequency = 130.81f // C3の音に固定
+    val baseFrequency = 65.41f // C2の音に変更（C3の半分の周波数）
     var bpm by remember { mutableFloatStateOf(120f) }
     var pulseWidth by remember { mutableFloatStateOf(0f) }
 
     var gate by remember { mutableStateOf(false) }
-    var frequency by remember { mutableFloatStateOf(130.81f) }
+    var frequency by remember { mutableFloatStateOf(65.41f) }
 
     // テクノらしいアルペジオパターン（ルート、オクターブ、5度、短3度、ルート高音域）
     val arpeggioPattern = listOf(1f, 2f, 1.5f, 1.2f, 4f)
