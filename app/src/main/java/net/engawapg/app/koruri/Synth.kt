@@ -25,7 +25,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import net.engawapg.lib.koruri.KoruriContent
+import net.engawapg.lib.koruri.processor.Chain
 import net.engawapg.lib.koruri.processor.Envelope
+import net.engawapg.lib.koruri.processor.LowPassFilter
 import net.engawapg.lib.koruri.processor.SquareWave
 
 @Composable
@@ -63,6 +65,10 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
     var decay by remember { mutableFloatStateOf(0.2f) }
     var sustain by remember { mutableFloatStateOf(0.7f) }
     var release by remember { mutableFloatStateOf(0.3f) }
+
+    // LPF parameters
+    var cutoff by remember { mutableFloatStateOf(1000f) }
+    var resonance by remember { mutableFloatStateOf(1f) }
 
     Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -195,6 +201,39 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                     )
                 }
             }
+
+            // LPF controls
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Low Pass Filter",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    // Cutoff
+                    Text("Cutoff: ${"%.1f".format(cutoff)} Hz")
+                    Slider(
+                        value = cutoff,
+                        onValueChange = { cutoff = it },
+                        valueRange = 20f..20000f,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    // Resonance
+                    Text("Resonance: ${"%.2f".format(resonance)}")
+                    Slider(
+                        value = resonance,
+                        onValueChange = { resonance = it },
+                        valueRange = 0.1f..10f,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
         }
     }
 
@@ -206,10 +245,16 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
             release = { release },
             gate = { gate }
         ) {
-            SquareWave(
-                frequency = { frequency },
-                pulseWidth = { pulseWidth }
-            )
+            Chain {
+                SquareWave(
+                    frequency = { frequency },
+                    pulseWidth = { pulseWidth }
+                )
+                LowPassFilter(
+                    cutoff = { cutoff },
+                    resonance = { resonance }
+                )
+            }
         }
     }
 }
