@@ -41,9 +41,98 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
     var gate by remember { mutableStateOf(false) }
     var frequency by remember { mutableFloatStateOf(65.41f) }
 
+    // エンベロープ値を計算する関数
+    var envelopeValue by remember { mutableFloatStateOf(0f) }
+
     // テクノらしいアルペジオパターン（ルート、オクターブ、5度、短3度、ルート高音域）
     val arpeggioPattern = listOf(1f, 2f, 1.5f, 1.2f, 4f)
     var currentStep by remember { mutableIntStateOf(0) }
+
+    // ADSR parameters - よりテクノらしい設定
+    var attack by remember { mutableFloatStateOf(0.01f) } // 非常に短いアタック
+    var decay by remember { mutableFloatStateOf(0.15f) }  // 短いディケイ
+    var sustain by remember { mutableFloatStateOf(0.4f) } // 低めのサスティン
+    var release by remember { mutableFloatStateOf(0.1f) } // 短いリリース
+
+    // LPF parameters - よりアグレッシブな初期設定
+    var cutoff by remember { mutableFloatStateOf(2500f) }  // 少し高めのカットオフ
+    var resonance by remember { mutableFloatStateOf(3f) }  // 高めのレゾナンス
+
+    // Pulse Width Modulation parameters
+    var basePulseWidth by remember { mutableFloatStateOf(0f) }      // ベースのPulse Width
+    var pwmAmount by remember { mutableFloatStateOf(0.5f) }         // モジュレーション量
+
+    // エンベロープジェネレーターの状態
+    var envelopePhase by remember { mutableStateOf("Idle") }
+    var envelopeTime by remember { mutableFloatStateOf(0f) }
+    var releaseLevel by remember { mutableFloatStateOf(0f) }
+    var previousGate by remember { mutableStateOf(false) }
+
+    // エンベロープ値をリアルタイムで更新
+    LaunchedEffect(gate, attack, decay, sustain, release) {
+        while (true) {
+            val currentGate = gate
+            val deltaTime = 0.016f // 約60FPS
+
+            // ゲート状態の変化を検出
+            if (currentGate && !previousGate) {
+                // ゲートオン - アタックフェーズ開始
+                envelopePhase = "Attack"
+                envelopeTime = 0f
+                previousGate = true
+            } else if (!currentGate && previousGate) {
+                // ゲートオフ - リリースフェーズ開始
+                if (envelopePhase != "Idle") {
+                    envelopePhase = "Release"
+                    envelopeTime = 0f
+                    releaseLevel = envelopeValue
+                }
+                previousGate = false
+            }
+
+            // エンベロープ値を計算
+            when (envelopePhase) {
+                "Attack" -> {
+                    envelopeValue = envelopeTime / attack
+                    envelopeTime += deltaTime
+                    if (envelopeTime >= attack) {
+                        envelopePhase = "Decay"
+                        envelopeTime = 0f
+                    }
+                }
+                "Decay" -> {
+                    val decayProgress = envelopeTime / decay
+                    envelopeValue = 1f - decayProgress * (1f - sustain)
+                    envelopeTime += deltaTime
+                    if (envelopeTime >= decay) {
+                        envelopePhase = "Sustain"
+                        envelopeValue = sustain
+                    }
+                }
+                "Sustain" -> {
+                    envelopeValue = sustain
+                }
+                "Release" -> {
+                    val releaseProgress = envelopeTime / release
+                    envelopeValue = releaseLevel * (1f - releaseProgress)
+                    envelopeTime += deltaTime
+                    if (envelopeTime >= release) {
+                        envelopePhase = "Idle"
+                        envelopeValue = 0f
+                    }
+                }
+                else -> {
+                    envelopeValue = 0f
+                }
+            }
+
+            // Pulse Widthをモジュレート
+            pulseWidth = basePulseWidth + (envelopeValue * pwmAmount * 2f - pwmAmount)
+            pulseWidth = pulseWidth.coerceIn(-1f, 1f) // 範囲制限
+
+            delay(16) // 約60FPS
+        }
+    }
 
     LaunchedEffect(isPlaying, bpm) {
         if (isPlaying) {
@@ -73,15 +162,6 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
         }
     }
 
-    // ADSR parameters - よりテクノらしい設定
-    var attack by remember { mutableFloatStateOf(0.01f) } // 非常に短いアタック
-    var decay by remember { mutableFloatStateOf(0.15f) }  // 短いディケイ
-    var sustain by remember { mutableFloatStateOf(0.4f) } // 低めのサスティン
-    var release by remember { mutableFloatStateOf(0.1f) } // 短いリリース
-
-    // LPF parameters - よりアグレッシブな初期設定
-    var cutoff by remember { mutableFloatStateOf(2500f) }  // 少し高めのカットオフ
-    var resonance by remember { mutableFloatStateOf(3f) }  // 高めのレゾナンス
 
     Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -123,7 +203,7 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                 }
             }
 
-            // Pulse Width control
+            // Pulse Width Modulation controls
             Card(
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -131,15 +211,33 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = "Pulse Width",
-                        style = MaterialTheme.typography.titleMedium
+                        text = "Pulse Width Modulation",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
                     )
-                    Text("${"%.2f".format(pulseWidth)}")
+
+                    // Base Pulse Width
+                    Text("Base Pulse Width: ${"%.2f".format(basePulseWidth)}")
                     Slider(
-                        value = pulseWidth,
-                        onValueChange = { pulseWidth = it },
+                        value = basePulseWidth,
+                        onValueChange = { basePulseWidth = it },
                         valueRange = -1f..1f,
                         modifier = Modifier.fillMaxWidth()
+                    )
+
+                    // PWM Amount
+                    Text("PWM Amount: ${"%.2f".format(pwmAmount)}")
+                    Slider(
+                        value = pwmAmount,
+                        onValueChange = { pwmAmount = it },
+                        valueRange = 0f..1f,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    // Current modulated pulse width display
+                    Text(
+                        text = "Current PW: ${"%.2f".format(pulseWidth)}",
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
