@@ -31,7 +31,7 @@ import net.engawapg.lib.koruri.processor.SquareWave
 @Composable
 internal fun SynthScreen(modifier: Modifier = Modifier) {
     var isPlaying by remember { mutableStateOf(false) }
-    var frequency by remember { mutableFloatStateOf(1000f) }
+    var frequency by remember { mutableFloatStateOf(100f) }
 
     var gate by remember { mutableStateOf(false) }
     LaunchedEffect(isPlaying) {
@@ -84,7 +84,7 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                     Slider(
                         value = frequency,
                         onValueChange = { frequency = it },
-                        valueRange = 20f..2000f,
+                        valueRange = 20f..300f,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
