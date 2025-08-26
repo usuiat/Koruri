@@ -32,13 +32,25 @@ import net.engawapg.lib.koruri.processor.SquareWave
 internal fun SynthScreen(modifier: Modifier = Modifier) {
     var isPlaying by remember { mutableStateOf(false) }
     var frequency by remember { mutableFloatStateOf(100f) }
+    var bpm by remember { mutableFloatStateOf(120f) }
 
     var gate by remember { mutableStateOf(false) }
-    LaunchedEffect(isPlaying) {
+    LaunchedEffect(isPlaying, bpm) {
         if (isPlaying) {
-            while (true) {
-                gate = !gate
-                delay(250)
+            if (bpm == 0f) {
+                // BPM=0なら常時gate ON
+                gate = true
+            } else {
+                // 4つ打ちリズム
+                while (true) {
+                    val beatDuration = (60000 / bpm).toLong() // BPMからミリ秒計算
+                    val gateDuration = (beatDuration * 0.3).toLong() // 拍の30%をゲートオン
+
+                    gate = true
+                    delay(gateDuration)
+                    gate = false
+                    delay(beatDuration - gateDuration)
+                }
             }
         } else {
             gate = false
@@ -85,6 +97,27 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                         value = frequency,
                         onValueChange = { frequency = it },
                         valueRange = 20f..300f,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
+            // BPM control
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "BPM (Beats Per Minute)",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text("${bpm.toInt()} BPM")
+                    Slider(
+                        value = bpm,
+                        onValueChange = { bpm = it },
+                        valueRange = 0f..240f,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
