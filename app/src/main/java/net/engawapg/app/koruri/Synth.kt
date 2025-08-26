@@ -41,8 +41,8 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
     var gate by remember { mutableStateOf(false) }
     var frequency by remember { mutableFloatStateOf(130.81f) }
 
-    // アルペジオパターン（ルート、3度、5度、オクターブ）
-    val arpeggioPattern = listOf(1f, 1.25f, 1.5f, 2f)
+    // テクノらしいアルペジオパターン（ルート、オクターブ、5度、短3度、ルート高音域）
+    val arpeggioPattern = listOf(1f, 2f, 1.5f, 1.2f, 4f)
     var currentStep by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(isPlaying, bpm) {
@@ -55,9 +55,9 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                 // アルペジオパターンをループ
                 while (true) {
                     val beatDuration = (60000 / bpm).toLong() // BPMからミリ秒計算
-                    val gateDuration = (beatDuration * 0.8).toLong() // 拍の80%�����ゲートオン
+                    val gateDuration = (beatDuration * 0.6).toLong() // 拍の60%をゲートオン（よりパンチのある音）
 
-                    // 現在のステ��プに対応する周波数を設定
+                    // 現在のステップに対応する周波数を設定
                     frequency = baseFrequency * arpeggioPattern[currentStep]
                     gate = true
                     delay(gateDuration)
@@ -73,15 +73,15 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
         }
     }
 
-    // ADSR parameters
-    var attack by remember { mutableFloatStateOf(0.1f) }
-    var decay by remember { mutableFloatStateOf(0.2f) }
-    var sustain by remember { mutableFloatStateOf(0.7f) }
-    var release by remember { mutableFloatStateOf(0.3f) }
+    // ADSR parameters - よりテクノらしい設定
+    var attack by remember { mutableFloatStateOf(0.01f) } // 非常に短いアタック
+    var decay by remember { mutableFloatStateOf(0.15f) }  // 短いディケイ
+    var sustain by remember { mutableFloatStateOf(0.4f) } // 低めのサスティン
+    var release by remember { mutableFloatStateOf(0.1f) } // 短いリリース
 
-    // LPF parameters
-    var cutoff by remember { mutableFloatStateOf(1000f) }
-    var resonance by remember { mutableFloatStateOf(1f) }
+    // LPF parameters - よりアグレッシブな初期設定
+    var cutoff by remember { mutableFloatStateOf(2500f) }  // 少し高めのカットオフ
+    var resonance by remember { mutableFloatStateOf(3f) }  // 高めのレゾナンス
 
     Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
         Column(
