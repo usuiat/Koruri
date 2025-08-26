@@ -10,10 +10,11 @@ fun Envelope(
     decay: () -> Float,
     sustain: () -> Float,
     release: () -> Float,
+    gate: () -> Boolean,
     content: @Composable () -> Unit
 ) {
     Block(
-        signalProcessor = EnvelopeGenerator(attack, decay, sustain, release),
+        signalProcessor = EnvelopeGenerator(attack, decay, sustain, release, gate),
         content = content
     )
 }
@@ -24,10 +25,11 @@ fun Envelope(
     decay: Float,
     sustain: Float,
     release: Float,
+    gate: Boolean,
     content: @Composable () -> Unit
 ) {
     Block(
-        signalProcessor = EnvelopeGenerator({ attack }, { decay }, { sustain }, { release }),
+        signalProcessor = EnvelopeGenerator({ attack }, { decay }, { sustain }, { release }, { gate }),
         content = content
     )
 }
@@ -36,7 +38,8 @@ private class EnvelopeGenerator(
     private val attack: () -> Float,
     private val decay: () -> Float,
     private val sustain: () -> Float,
-    private val release: () -> Float
+    private val release: () -> Float,
+    private val gate: () -> Boolean
 ) : SignalProcessor {
 
     private enum class Phase {
@@ -48,14 +51,13 @@ private class EnvelopeGenerator(
     private var phaseTime = 0f
     private var releaseLevel = 0f
     private val sampleRate = 48000
-    private var wasInputActive = false
-    private var storedSignal = 0f
+    private var previousGate = false
 
     override fun process(input: FloatArray, childrenNode: List<KoruriNode>): FloatArray {
         val output = FloatArray(input.size)
         val deltaTime = 1f / sampleRate
 
-        // Get child signal first
+        // Get child signal first (always get the child signal)
         val childOutput = if (childrenNode.isNotEmpty()) {
             childrenNode[0].process(input)
         } else {
@@ -63,27 +65,22 @@ private class EnvelopeGenerator(
         }
 
         for (i in input.indices) {
-            // Gate detection based on child signal
-            val hasChildSignal = childOutput[i] != 0f
+            // Check gate state changes
+            val currentGate = gate()
 
-            if (hasChildSignal && !wasInputActive) {
+            if (currentGate && !previousGate) {
                 // Gate on - start attack phase
                 phase = Phase.Attack
                 phaseTime = 0f
-                wasInputActive = true
-                storedSignal = childOutput[i] // Store the signal level
-            } else if (!hasChildSignal && wasInputActive && phase != Phase.Release) {
+                previousGate = true
+            } else if (!currentGate && previousGate) {
                 // Gate off - start release phase
-                phase = Phase.Release
-                phaseTime = 0f
-                releaseLevel = envelope
-                wasInputActive = false
-                // Keep storedSignal for release phase
-            }
-
-            // Update stored signal while input is active
-            if (hasChildSignal) {
-                storedSignal = childOutput[i]
+                if (phase != Phase.Idle) {
+                    phase = Phase.Release
+                    phaseTime = 0f
+                    releaseLevel = envelope
+                }
+                previousGate = false
             }
 
             // Process envelope phases
@@ -146,13 +143,8 @@ private class EnvelopeGenerator(
                 }
             }
 
-            // Apply envelope - use stored signal during release phase
-            if (phase == Phase.Release) {
-                output[i] = storedSignal * envelope
-            } else {
-                output[i] = childOutput[i] * envelope
-            }
-
+            // Apply envelope to child output
+            output[i] = childOutput[i] * envelope
             phaseTime += deltaTime
         }
 
