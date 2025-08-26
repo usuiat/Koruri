@@ -14,6 +14,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -22,8 +23,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import net.engawapg.lib.koruri.KoruriContent
-import net.engawapg.lib.koruri.processor.Chain
 import net.engawapg.lib.koruri.processor.Envelope
 import net.engawapg.lib.koruri.processor.SquareWave
 
@@ -31,6 +32,18 @@ import net.engawapg.lib.koruri.processor.SquareWave
 internal fun SynthScreen(modifier: Modifier = Modifier) {
     var isPlaying by remember { mutableStateOf(false) }
     var frequency by remember { mutableFloatStateOf(1000f) }
+
+    var gate by remember { mutableStateOf(false) }
+    LaunchedEffect(isPlaying) {
+        if (isPlaying) {
+            while (true) {
+                gate = !gate
+                delay(250)
+            }
+        } else {
+            gate = false
+        }
+    }
 
     // ADSR parameters
     var attack by remember { mutableFloatStateOf(0.1f) }
@@ -71,7 +84,7 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                     Slider(
                         value = frequency,
                         onValueChange = { frequency = it },
-                        valueRange = 200f..2000f,
+                        valueRange = 20f..2000f,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -136,7 +149,7 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
             decay = { decay },
             sustain = { sustain },
             release = { release },
-            gate = { isPlaying }
+            gate = { gate }
         ) {
             SquareWave { frequency }
         }
