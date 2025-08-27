@@ -45,7 +45,16 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
     var envelopeValue by remember { mutableFloatStateOf(0f) }
 
     // テクノらしいアルペジオパターン（ルート、オクターブ、5度、短3度、ルート高音域）
-    val arpeggioPattern = listOf(1f, 2f, 1.5f, 1.2f, 4f)
+    val arpeggioPattern = listOf(
+        1.0f,    // C
+        1.5f,    // G
+        1.681f,  // Am
+        1.26f,   // Em
+        1.334f,  // F
+        1.0f,    // C
+        1.334f,  // F
+        1.5f     // G
+    )
     var currentStep by remember { mutableIntStateOf(0) }
 
     // ADSR parameters - よりテクノらしい設定
