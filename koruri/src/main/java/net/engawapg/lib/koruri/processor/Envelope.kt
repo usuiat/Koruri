@@ -10,12 +10,10 @@ fun Envelope(
     decay: () -> Float,
     sustain: () -> Float,
     release: () -> Float,
-    gate: () -> Boolean,
-    content: @Composable () -> Unit
+    gate: () -> Boolean
 ) {
     Block(
-        signalProcessor = EnvelopeGenerator(attack, decay, sustain, release, gate),
-        content = content
+        signalProcessor = EnvelopeGenerator(attack, decay, sustain, release, gate)
     )
 }
 
@@ -25,12 +23,10 @@ fun Envelope(
     decay: Float,
     sustain: Float,
     release: Float,
-    gate: Boolean,
-    content: @Composable () -> Unit
+    gate: Boolean
 ) {
     Block(
-        signalProcessor = EnvelopeGenerator({ attack }, { decay }, { sustain }, { release }, { gate }),
-        content = content
+        signalProcessor = EnvelopeGenerator({ attack }, { decay }, { sustain }, { release }, { gate })
     )
 }
 
@@ -54,15 +50,9 @@ private class EnvelopeGenerator(
     private var previousGate = false
 
     override fun process(input: FloatArray, childrenNode: List<KoruriNode>): FloatArray {
-        val output = FloatArray(input.size)
+        // inputをコピーしてエンベロープ処理
+        val output = input.copyOf()
         val deltaTime = 1f / sampleRate
-
-        // Get child signal first (always get the child signal)
-        val childOutput = if (childrenNode.isNotEmpty()) {
-            childrenNode[0].process(input)
-        } else {
-            FloatArray(input.size) // Generate silence if no child
-        }
 
         for (i in input.indices) {
             // Check gate state changes
@@ -143,8 +133,8 @@ private class EnvelopeGenerator(
                 }
             }
 
-            // Apply envelope to child output
-            output[i] = childOutput[i] * envelope
+            // Apply envelope to input signal
+            output[i] = input[i] * envelope
             phaseTime += deltaTime
         }
 

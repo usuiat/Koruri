@@ -23,10 +23,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import net.engawapg.app.koruri.ui.theme.KoruriTheme
 import net.engawapg.lib.koruri.KoruriContent
 import net.engawapg.lib.koruri.processor.Chain
 import net.engawapg.lib.koruri.processor.Envelope
@@ -46,7 +44,6 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
     // エンベロープ値を計算する関数
     var envelopeValue by remember { mutableFloatStateOf(0f) }
 
-    // テクノらしいアルペジオパターン（ルート、オクターブ、5度、短3度、ルート高音域）
     val arpeggioPattern = listOf(
         1.0f,    // C
         1.5f,    // G
@@ -59,13 +56,13 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
     )
     var currentStep by remember { mutableIntStateOf(0) }
 
-    // ADSR parameters - よりテクノらしい設定
+    // ADSR parameters
     var attack by remember { mutableFloatStateOf(0.01f) } // 非常に短いアタック
     var decay by remember { mutableFloatStateOf(0.15f) }  // 短いディケイ
     var sustain by remember { mutableFloatStateOf(0.4f) } // 低めのサスティン
     var release by remember { mutableFloatStateOf(0.01f) } // 短いリリース
 
-    // LPF parameters - よりアグレッシブな初期設定
+    // LPF parameters
     var cutoff by remember { mutableFloatStateOf(20000f) }  // 少し高めのカットオフ
     var resonance by remember { mutableFloatStateOf(0.1f) }  // 高めのレゾナンス
 
@@ -340,23 +337,22 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
     }
 
     KoruriContent {
-        Envelope(
-            attack = { attack },
-            decay = { decay },
-            sustain = { sustain },
-            release = { release },
-            gate = { gate }
-        ) {
-            Chain {
-                SquareWave(
-                    frequency = { frequency },
-                    pulseWidth = { pulseWidth }
-                )
-                LowPassFilter(
-                    cutoff = { cutoff },
-                    resonance = { resonance }
-                )
-            }
+        Chain {
+            SquareWave(
+                frequency = { frequency },
+                pulseWidth = { pulseWidth }
+            )
+            Envelope(
+                attack = { attack },
+                decay = { decay },
+                sustain = { sustain },
+                release = { release },
+                gate = { gate }
+            )
+            LowPassFilter(
+                cutoff = { cutoff },
+                resonance = { resonance }
+            )
         }
     }
 }
