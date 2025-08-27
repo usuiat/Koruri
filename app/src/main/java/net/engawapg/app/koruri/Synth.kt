@@ -23,8 +23,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import net.engawapg.app.koruri.ui.theme.KoruriTheme
 import net.engawapg.lib.koruri.KoruriContent
 import net.engawapg.lib.koruri.processor.Chain
 import net.engawapg.lib.koruri.processor.Envelope
@@ -61,15 +63,15 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
     var attack by remember { mutableFloatStateOf(0.01f) } // 非常に短いアタック
     var decay by remember { mutableFloatStateOf(0.15f) }  // 短いディケイ
     var sustain by remember { mutableFloatStateOf(0.4f) } // 低めのサスティン
-    var release by remember { mutableFloatStateOf(0.1f) } // 短いリリース
+    var release by remember { mutableFloatStateOf(0.01f) } // 短いリリース
 
     // LPF parameters - よりアグレッシブな初期設定
-    var cutoff by remember { mutableFloatStateOf(2500f) }  // 少し高めのカットオフ
-    var resonance by remember { mutableFloatStateOf(3f) }  // 高めのレゾナンス
+    var cutoff by remember { mutableFloatStateOf(20000f) }  // 少し高めのカットオフ
+    var resonance by remember { mutableFloatStateOf(0.1f) }  // 高めのレゾナンス
 
     // Pulse Width Modulation parameters
     var basePulseWidth by remember { mutableFloatStateOf(0f) }      // ベースのPulse Width
-    var pwmAmount by remember { mutableFloatStateOf(0.5f) }         // モジュレーション量
+    var pwmAmount by remember { mutableFloatStateOf(0.0f) }         // モジュレーション量
 
     // エンベロープジェネレーターの状態
     var envelopePhase by remember { mutableStateOf("Idle") }
@@ -191,65 +193,26 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
             }
 
 
-            // BPM control
-            Card(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(
-                        text = "BPM (Beats Per Minute)",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text("${bpm.toInt()} BPM")
-                    Slider(
-                        value = bpm,
-                        onValueChange = { bpm = it },
-                        valueRange = 0f..240f,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-
-            // Pulse Width Modulation controls
-            Card(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(
-                        text = "Pulse Width Modulation",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-
-                    // Base Pulse Width
-                    Text("Base Pulse Width: ${"%.2f".format(basePulseWidth)}")
-                    Slider(
-                        value = basePulseWidth,
-                        onValueChange = { basePulseWidth = it },
-                        valueRange = -1f..1f,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    // PWM Amount
-                    Text("PWM Amount: ${"%.2f".format(pwmAmount)}")
-                    Slider(
-                        value = pwmAmount,
-                        onValueChange = { pwmAmount = it },
-                        valueRange = 0f..1f,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    // Current modulated pulse width display
-                    Text(
-                        text = "Current PW: ${"%.2f".format(pulseWidth)}",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
+//            // BPM control
+//            Card(
+//                modifier = Modifier.fillMaxWidth()
+//            ) {
+//                Column(
+//                    modifier = Modifier.padding(16.dp)
+//                ) {
+//                    Text(
+//                        text = "BPM (Beats Per Minute)",
+//                        style = MaterialTheme.typography.titleMedium
+//                    )
+//                    Text("${bpm.toInt()} BPM")
+//                    Slider(
+//                        value = bpm,
+//                        onValueChange = { bpm = it },
+//                        valueRange = 0f..240f,
+//                        modifier = Modifier.fillMaxWidth()
+//                    )
+//                }
+//            }
 
             // ADSR controls
             Card(
@@ -298,6 +261,45 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                         onValueChange = { release = it },
                         valueRange = 0.01f..3.0f,
                         modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
+            // Pulse Width Modulation controls
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Pulse Width Modulation",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    // Base Pulse Width
+                    Text("Base Pulse Width: ${"%.2f".format(basePulseWidth)}")
+                    Slider(
+                        value = basePulseWidth,
+                        onValueChange = { basePulseWidth = it },
+                        valueRange = -1f..1f,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    // PWM Amount
+                    Text("PWM Amount: ${"%.2f".format(pwmAmount)}")
+                    Slider(
+                        value = pwmAmount,
+                        onValueChange = { pwmAmount = it },
+                        valueRange = 0f..1f,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    // Current modulated pulse width display
+                    Text(
+                        text = "Current PW: ${"%.2f".format(pulseWidth)}",
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
