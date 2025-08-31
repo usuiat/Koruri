@@ -5,12 +5,12 @@ import net.engawapg.lib.koruri.KoruriNode
 import net.engawapg.lib.koruri.audio.Block
 
 @Composable
-fun Volume(volume: Float) {
+public fun Volume(volume: Float) {
     Block(VolumeProcessor(volume))
 }
 
 @Composable
-fun Volume(volume: () -> Float) {
+public fun Volume(volume: () -> Float) {
     Block(VolumeProcessor(volume))
 }
 

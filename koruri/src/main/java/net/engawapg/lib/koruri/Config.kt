@@ -1,5 +1,5 @@
 package net.engawapg.lib.koruri
 
-object KoruriAudioConfig {
-    const val BUFFER_SIZE = 128
+public object KoruriAudioConfig {
+    public const val BUFFER_SIZE: Int = 128
 }

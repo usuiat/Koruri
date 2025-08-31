@@ -8,7 +8,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 @Composable
-fun LowPassFilter(
+public fun LowPassFilter(
     cutoff: Float,
     resonance: Float = 1f
 ) {
@@ -18,7 +18,7 @@ fun LowPassFilter(
 }
 
 @Composable
-fun LowPassFilter(
+public fun LowPassFilter(
     cutoff: () -> Float,
     resonance: () -> Float = { 1f }
 ) {

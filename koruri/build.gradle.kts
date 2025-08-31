@@ -4,6 +4,10 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+kotlin {
+    explicitApi()
+}
+
 android {
     namespace = "net.engawapg.lib.koruri"
     compileSdk = 35

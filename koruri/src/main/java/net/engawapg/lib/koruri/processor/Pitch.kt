@@ -1,7 +1,7 @@
 package net.engawapg.lib.koruri.processor
 
-enum class Pitch(
-    val frequency: Float,
+public enum class Pitch(
+    public val frequency: Float,
 ) {
     Silence(0.0f),
     C4(261.63f),

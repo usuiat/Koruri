@@ -5,7 +5,7 @@ import net.engawapg.lib.koruri.KoruriNode
 import net.engawapg.lib.koruri.audio.Block
 
 @Composable
-fun Chain(content: @Composable () -> Unit) {
+public fun Chain(content: @Composable () -> Unit) {
     Block(content = content, signalProcessor = ChainProcessor())
 }
 

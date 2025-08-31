@@ -5,7 +5,7 @@ import net.engawapg.lib.koruri.KoruriNode
 import net.engawapg.lib.koruri.audio.Block
 
 @Composable
-fun Envelope(
+public fun Envelope(
     attack: () -> Float,
     decay: () -> Float,
     sustain: () -> Float,
@@ -18,7 +18,7 @@ fun Envelope(
 }
 
 @Composable
-fun Envelope(
+public fun Envelope(
     attack: Float,
     decay: Float,
     sustain: Float,

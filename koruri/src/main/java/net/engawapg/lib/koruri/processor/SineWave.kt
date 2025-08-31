@@ -7,12 +7,12 @@ import kotlin.math.PI
 import kotlin.math.sin
 
 @Composable
-fun SineWave(amplitude: Float = 0.5f, frequency: Float) {
+public fun SineWave(amplitude: Float = 0.5f, frequency: Float) {
     Block(signalProcessor = SineWaveGenerator(amplitude, frequency))
 }
 
 @Composable
-fun SineWave(amplitude: Float = 0.5f, frequency: () -> Float) {
+public fun SineWave(amplitude: Float = 0.5f, frequency: () -> Float) {
     Block(signalProcessor = SineWaveGenerator(amplitude, frequency))
 }
 

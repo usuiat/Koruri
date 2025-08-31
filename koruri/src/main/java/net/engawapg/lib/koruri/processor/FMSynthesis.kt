@@ -7,7 +7,7 @@ import kotlin.math.PI
 import kotlin.math.sin
 
 @Composable
-fun FMSynthesis(
+public fun FMSynthesis(
     carrierFrequency: Float,
     modulator: FMSynthesisModulator,
 ) {
@@ -16,7 +16,7 @@ fun FMSynthesis(
     )
 }
 
-data class FMSynthesisModulator(
+public data class FMSynthesisModulator(
     val ratio: Float,
     val index: Float,
 )

@@ -15,7 +15,7 @@ import kotlinx.coroutines.withContext
 import net.engawapg.lib.koruri.audio.KoruriAudio
 
 @Composable
-fun KoruriContent(content: @Composable () -> Unit) {
+public fun KoruriContent(content: @Composable () -> Unit) {
     val koruri = remember { Koruri() }
     koruri.setContent(content)
 
@@ -26,7 +26,7 @@ fun KoruriContent(content: @Composable () -> Unit) {
     }
 }
 
-fun setKoruriContent(content: @Composable () -> Unit) {
+public fun setKoruriContent(content: @Composable () -> Unit) {
     val koruri = Koruri()
     koruri.setContent(content)
 }

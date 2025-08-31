@@ -13,7 +13,7 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @Composable
-fun InstrumentNote(
+public fun InstrumentNote(
     note: Note,
     instrument: Instrument,
     amplitude: Float = 0.5f,
@@ -36,21 +36,21 @@ fun InstrumentNote(
     }
 }
 
-class Note(
-    val pitch: Pitch,
+public class Note(
+    public val pitch: Pitch,
 ) {
-    val id = Uuid.random()
-    companion object {
-        val Silence = Note(Pitch.Silence)
+    public val id: Uuid = Uuid.random()
+    public companion object {
+        public val Silence: Note = Note(Pitch.Silence)
     }
 }
 
-data class Instrument(
+public data class Instrument(
     val modulator: FMSynthesisModulator,
     val envelopeSpec: AnimationSpec<Float>,
 ) {
-    companion object {
-        val Celesta = Instrument(
+    public companion object {
+        public val Celesta: Instrument = Instrument(
             modulator = FMSynthesisModulator(
                 ratio = 4.0f,
                 index = 1.5f,
@@ -61,7 +61,7 @@ data class Instrument(
                 easing = EaseOutExpo
             )
         )
-        val ElectricPiano = Instrument(
+        public val ElectricPiano: Instrument = Instrument(
             modulator = FMSynthesisModulator(
                 ratio = 1.0f,
                 index = 0.5f,
@@ -72,7 +72,7 @@ data class Instrument(
                 easing = EaseOutExpo
             )
         )
-        val SoftPad = Instrument(
+        public val SoftPad: Instrument = Instrument(
             modulator = FMSynthesisModulator(
                 ratio = 0.5f,
                 index = 1.0f,
@@ -83,7 +83,7 @@ data class Instrument(
                 easing = EaseOutExpo
             )
         )
-        val CrystalBell = Instrument(
+        public val CrystalBell: Instrument = Instrument(
             modulator = FMSynthesisModulator(
                 ratio = 7f,
                 index = 1f,

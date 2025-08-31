@@ -6,7 +6,7 @@ import net.engawapg.lib.koruri.audio.Block
 import kotlin.math.PI
 
 @Composable
-fun SquareWave(
+public fun SquareWave(
     amplitude: Float = 0.5f,
     frequency: Float,
     pulseWidth: Float = 0f
@@ -15,7 +15,7 @@ fun SquareWave(
 }
 
 @Composable
-fun SquareWave(
+public fun SquareWave(
     amplitude: Float = 0.5f,
     frequency: () -> Float,
     pulseWidth: () -> Float = { 0f }
