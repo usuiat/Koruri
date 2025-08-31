@@ -18,7 +18,6 @@ internal class KoruriNode {
         return output
     }
 
-    fun process(input: FloatArray): FloatArray {
-        return processor.process(input, children)
-    }
+    fun process(input: FloatArray): FloatArray =
+        processor.process(input, children)
 }
