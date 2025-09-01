@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.vanniktech.maven.publish)
+    alias(libs.plugins.dokka)
 }
 
 kotlin {
@@ -38,6 +39,18 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+}
+
+dokka {
+    dokkaSourceSets.main {
+        enableAndroidDocumentationLink = true
+    }
+    pluginsConfiguration.html {
+        moduleVersion = rootProject.properties["VERSION_NAME"]!!.toString()
+    }
+    dokkaPublications.html {
+        outputDirectory = file("$rootDir/docs")
     }
 }
 

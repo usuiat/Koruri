@@ -42,4 +42,4 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 vanniktech-maven-publish = { id = "com.vanniktech.maven.publish", version = "0.34.0" }
-
+dokka = { id = "org.jetbrains.dokka", version = "2.0.0" }
