@@ -12,6 +12,14 @@ import androidx.compose.runtime.remember
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
+/**
+ * Composable for playing an instrument note.
+ * Generates sound using FM synthesis and applies an envelope to the note.
+ *
+ * @param note The note to play.
+ * @param instrument The instrument definition.
+ * @param amplitude The initial amplitude of the note.
+ */
 @Composable
 public fun InstrumentNote(
     note: Note,
@@ -36,6 +44,12 @@ public fun InstrumentNote(
     }
 }
 
+/**
+ * Musical note.
+ *
+ * @property pitch The pitch of the note.
+ * @property id The unique identifier for the note.
+ */
 public class Note(
     public val pitch: Pitch,
 ) {
@@ -45,6 +59,12 @@ public class Note(
     }
 }
 
+/**
+ * Definition of instrument sound
+ *
+ * @property modulator The FM synthesis modulator.
+ * @property envelopeSpec The envelope animation specification.
+ */
 public data class Instrument(
     val modulator: FMSynthesisModulator,
     val envelopeSpec: AnimationSpec<Float>,

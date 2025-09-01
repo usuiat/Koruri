@@ -4,6 +4,12 @@ import androidx.compose.runtime.Composable
 import net.engawapg.lib.koruri.KoruriNode
 import net.engawapg.lib.koruri.audio.Block
 
+/**
+ * Composable for chaining multiple audio processors.
+ * Applies child processors in sequence to the audio signal.
+ *
+ * @param content The child composables to be chained.
+ */
 @Composable
 public fun Chain(content: @Composable () -> Unit) {
     Block(content = content, signalProcessor = ChainProcessor())

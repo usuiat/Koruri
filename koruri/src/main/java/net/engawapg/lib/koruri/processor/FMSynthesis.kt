@@ -6,6 +6,13 @@ import net.engawapg.lib.koruri.audio.Block
 import kotlin.math.PI
 import kotlin.math.sin
 
+/**
+ * Composable for FM synthesis.
+ * Generates sound using frequency modulation synthesis.
+ *
+ * @param carrierFrequency The carrier frequency for FM synthesis.
+ * @param modulator The FM synthesis modulator parameters.
+ */
 @Composable
 public fun FMSynthesis(
     carrierFrequency: Float,
@@ -16,6 +23,12 @@ public fun FMSynthesis(
     )
 }
 
+/**
+ * FM synthesis modulator parameters.
+ *
+ * @property ratio The frequency ratio of the modulator to the carrier.
+ * @property index The modulation index.
+ */
 public data class FMSynthesisModulator(
     val ratio: Float,
     val index: Float,

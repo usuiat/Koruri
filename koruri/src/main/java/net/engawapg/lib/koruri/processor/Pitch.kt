@@ -1,5 +1,10 @@
 package net.engawapg.lib.koruri.processor
 
+/**
+ * Enum representing musical pitches and their corresponding frequencies.
+ *
+ * @property frequency The frequency (Hz) of the pitch.
+ */
 public enum class Pitch(
     public val frequency: Float,
 ) {

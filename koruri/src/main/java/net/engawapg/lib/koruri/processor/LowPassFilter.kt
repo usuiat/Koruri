@@ -7,6 +7,12 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
+/**
+ * Composable for applying a low-pass filter to the audio signal.
+ *
+ * @param cutoff The cutoff frequency of the filter.
+ * @param resonance The resonance (Q factor) of the filter.
+ */
 @Composable
 public fun LowPassFilter(
     cutoff: Float,
@@ -17,6 +23,12 @@ public fun LowPassFilter(
     )
 }
 
+/**
+ * Composable for applying a low-pass filter to the audio signal.
+ *
+ * @param cutoff A lambda returning the current cutoff frequency.
+ * @param resonance A lambda returning the current resonance (Q factor).
+ */
 @Composable
 public fun LowPassFilter(
     cutoff: () -> Float,

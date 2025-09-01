@@ -4,6 +4,17 @@ import androidx.compose.runtime.Composable
 import net.engawapg.lib.koruri.KoruriNode
 import net.engawapg.lib.koruri.audio.Block
 
+/**
+ * Composable for applying an ADSR envelope to the audio signal.
+ * Envelope parameters can be provided as lambdas for dynamic control.
+ *
+ * @param attack Lambda returning the attack time.
+ * @param decay Lambda returning the decay time.
+ * @param sustain Lambda returning the sustain level.
+ * @param release Lambda returning the release time.
+ * @param gate Lambda returning the gate signal (note on/off).
+ * Changing gate resets the envelope.
+ */
 @Composable
 public fun Envelope(
     attack: () -> Float,
@@ -17,6 +28,15 @@ public fun Envelope(
     )
 }
 
+/**
+ * Composable for applying an ADSR envelope to the audio signal.
+ *
+ * @param attack The attack time.
+ * @param decay The decay time.
+ * @param sustain The sustain level.
+ * @param release The release time.
+ * @param gate The gate signal (note on/off).
+ */
 @Composable
 public fun Envelope(
     attack: Float,

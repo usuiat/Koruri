@@ -3,6 +3,10 @@ package net.engawapg.lib.koruri
 import net.engawapg.lib.koruri.processor.ChainProcessor
 import net.engawapg.lib.koruri.processor.SignalProcessor
 
+/**
+ * Represents a node in the Koruri audio composition tree.
+ * Each node can have child nodes and a signal processor.
+ */
 internal class KoruriNode {
     val children = ArrayList<KoruriNode>()
 

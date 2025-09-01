@@ -5,6 +5,14 @@ import net.engawapg.lib.koruri.KoruriNode
 import net.engawapg.lib.koruri.audio.Block
 import kotlin.math.PI
 
+/**
+ * Composable for generating a square wave.
+ * Produces a square wave signal with specified amplitude, frequency, and pulse width.
+ *
+ * @param amplitude The amplitude of the square wave.
+ * @param frequency The frequency of the square wave.
+ * @param pulseWidth The pulse width of the square wave.
+ */
 @Composable
 public fun SquareWave(
     amplitude: Float = 0.5f,
@@ -14,6 +22,14 @@ public fun SquareWave(
     Block(signalProcessor = SquareWaveGenerator(amplitude, frequency, pulseWidth))
 }
 
+/**
+ * Composable for generating a square wave.
+ * Produces a square wave signal with specified amplitude, dynamic frequency, and dynamic pulse width.
+ *
+ * @param amplitude The amplitude of the square wave.
+ * @param frequency A lambda returning the current frequency of the square wave.
+ * @param pulseWidth A lambda returning the current pulse width of the square wave.
+ */
 @Composable
 public fun SquareWave(
     amplitude: Float = 0.5f,

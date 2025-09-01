@@ -14,6 +14,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.engawapg.lib.koruri.audio.KoruriAudio
 
+/**
+ * Composable function to set up and manage Koruri audio content.
+ * Initializes the Koruri engine and disposes it when no longer needed.
+ * This is the entry point for using Koruri within a Compose UI.
+ *
+ * @param content The Koruri composable content to be processed for audio output.
+ */
 @Composable
 public fun KoruriContent(content: @Composable () -> Unit) {
     val koruri = remember { Koruri() }
@@ -26,6 +33,13 @@ public fun KoruriContent(content: @Composable () -> Unit) {
     }
 }
 
+/**
+ * Sets up Koruri audio content outside of Compose context.
+ * Initializes the Koruri engine and applies the given composable content.
+ * This is the entry point for using Koruri in non-Compose environments.
+ *
+ * @param content The Koruri composable content to be processed for audio output.
+ */
 public fun setKoruriContent(content: @Composable () -> Unit) {
     val koruri = Koruri()
     koruri.setContent(content)

@@ -4,6 +4,11 @@ import androidx.compose.runtime.Composable
 import net.engawapg.lib.koruri.KoruriNode
 import net.engawapg.lib.koruri.audio.Block
 
+/**
+ * Composable for mixing multiple audio signals.
+ *
+ * @param content The child composables to be mixed.
+ */
 @Composable
 public fun Mix(content: @Composable () -> Unit) {
     Block(content = content, signalProcessor = MixProcessor())

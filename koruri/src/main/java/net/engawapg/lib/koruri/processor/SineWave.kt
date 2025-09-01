@@ -6,11 +6,25 @@ import net.engawapg.lib.koruri.audio.Block
 import kotlin.math.PI
 import kotlin.math.sin
 
+/**
+ * Composable for generating a sine wave.
+ * Produces a sine wave signal with specified amplitude and frequency.
+ *
+ * @param amplitude The amplitude of the sine wave.
+ * @param frequency The frequency of the sine wave.
+ */
 @Composable
 public fun SineWave(amplitude: Float = 0.5f, frequency: Float) {
     Block(signalProcessor = SineWaveGenerator(amplitude, frequency))
 }
 
+/**
+ * Composable for generating a sine wave.
+ * Produces a sine wave signal with specified amplitude and dynamic frequency.
+ *
+ * @param amplitude The amplitude of the sine wave.
+ * @param frequency A lambda returning the current frequency of the sine wave.
+ */
 @Composable
 public fun SineWave(amplitude: Float = 0.5f, frequency: () -> Float) {
     Block(signalProcessor = SineWaveGenerator(amplitude, frequency))
