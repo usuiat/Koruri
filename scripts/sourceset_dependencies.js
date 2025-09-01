@@ -1,0 +1,1 @@
+sourceset_dependencies='{":koruri/debug":[],":koruri/main":[],":koruri/release":[]}'
