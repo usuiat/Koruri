@@ -29,7 +29,7 @@ import net.engawapg.lib.koruri.processor.SignalProcessor
  * @param signalProcessor The processor to apply to the audio signal.
  */
 @Composable
-internal fun Block(signalProcessor: SignalProcessor) {
+public fun Block(signalProcessor: SignalProcessor) {
     ReusableComposeNode<KoruriNode, KoruriApplier>(
         factory = ::KoruriNode,
         update = {
@@ -46,7 +46,7 @@ internal fun Block(signalProcessor: SignalProcessor) {
  * @param signalProcessor The processor to apply to the audio signal.
  */
 @Composable
-internal fun Block(
+public fun Block(
     content: @Composable () -> Unit,
     signalProcessor: SignalProcessor,
 ) {
