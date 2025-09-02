@@ -38,7 +38,7 @@ import net.engawapg.lib.koruri.KoruriContent
 import net.engawapg.lib.koruri.processor.SineWave
 
 @Composable
-internal fun VariableSineWaveScreen(
+internal fun SineWaveScreen(
     modifier: Modifier = Modifier
 ) {
     var isPlaying by remember { mutableStateOf(false) }

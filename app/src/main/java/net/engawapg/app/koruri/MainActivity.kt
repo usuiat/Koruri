@@ -53,8 +53,8 @@ class MainActivity : ComponentActivity() {
                             onSampleSelect = { navController.navigate(it) }
                         )
                     }
-                    composable<Sample.VariableSineWave> {
-                        VariableSineWaveScreen()
+                    composable<Sample.SineWave> {
+                        SineWaveScreen()
                     }
                     composable<Sample.Instruments> {
                         InstrumentsScreen()
@@ -90,9 +90,9 @@ private fun MainScreen(
             Text("Koruri Samples")
 
             Button(
-                onClick = { onSampleSelect(Sample.VariableSineWave) },
+                onClick = { onSampleSelect(Sample.SineWave) },
             ) {
-                Text("Variable Sine Wave")
+                Text("Sine Wave")
             }
             Button(
                 onClick = { onSampleSelect(Sample.Instruments) },
@@ -120,7 +120,7 @@ private fun MainScreen(
 
 private sealed interface Sample {
     @Serializable
-    data object VariableSineWave: Sample
+    data object SineWave: Sample
     @Serializable
     data object Instruments: Sample
     @Serializable
