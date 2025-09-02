@@ -17,7 +17,7 @@
 package net.engawapg.lib.koruri.processor
 
 import androidx.compose.runtime.Composable
-import net.engawapg.lib.koruri.KoruriNode
+import net.engawapg.lib.koruri.AudioProcessorNode
 import net.engawapg.lib.koruri.audio.Block
 
 /**
@@ -32,10 +32,10 @@ public fun Chain(content: @Composable () -> Unit) {
 }
 
 internal class ChainProcessor : SignalProcessor {
-    override fun process(input: FloatArray, childrenNode: List<KoruriNode>): FloatArray {
+    override fun process(input: FloatArray, children: List<AudioProcessorNode>): FloatArray {
         var signal = input
-        for (node in childrenNode) {
-            signal = node.process(signal)
+        for (child in children) {
+            signal = child.process(signal)
         }
         return signal
     }

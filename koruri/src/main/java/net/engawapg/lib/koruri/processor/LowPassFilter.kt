@@ -17,7 +17,7 @@
 package net.engawapg.lib.koruri.processor
 
 import androidx.compose.runtime.Composable
-import net.engawapg.lib.koruri.KoruriNode
+import net.engawapg.lib.koruri.AudioProcessorNode
 import net.engawapg.lib.koruri.audio.Block
 import kotlin.math.PI
 import kotlin.math.cos
@@ -66,7 +66,7 @@ private class LowPassFilterProcessor(
     private var y1 = 0f
     private var y2 = 0f
 
-    override fun process(input: FloatArray, childrenNode: List<KoruriNode>): FloatArray {
+    override fun process(input: FloatArray, children: List<AudioProcessorNode>): FloatArray {
         // inputをコピーしてフィルター処理
         val signal = input.copyOf()
 

@@ -17,7 +17,7 @@
 package net.engawapg.lib.koruri.processor
 
 import androidx.compose.runtime.Composable
-import net.engawapg.lib.koruri.KoruriNode
+import net.engawapg.lib.koruri.AudioProcessorNode
 import net.engawapg.lib.koruri.audio.Block
 import kotlin.math.PI
 import kotlin.math.sin
@@ -60,7 +60,7 @@ private class SineWaveGenerator(
     private val sampleRate = 48000
     private var phase = 0.0f
 
-    override fun process(input: FloatArray, childrenNode: List<KoruriNode>): FloatArray {
+    override fun process(input: FloatArray, children: List<AudioProcessorNode>): FloatArray {
         val frequency = frequency()
         val output = FloatArray(input.size)
         if (frequency == 0f) {

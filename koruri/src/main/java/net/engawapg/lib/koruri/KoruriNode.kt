@@ -20,24 +20,37 @@ import net.engawapg.lib.koruri.processor.ChainProcessor
 import net.engawapg.lib.koruri.processor.SignalProcessor
 
 /**
+ * Interface for nodes that can process audio signals.
+ */
+public interface AudioProcessorNode {
+    /**
+     * Processes the input audio signal and returns the processed result.
+     *
+     * @param input The input audio data
+     * @return The processed audio data
+     */
+    public fun process(input: FloatArray): FloatArray
+}
+
+/**
  * Represents a node in the Koruri audio composition tree.
  * Each node can have child nodes and a signal processor.
  */
-public class KoruriNode {
-    public val children: ArrayList<KoruriNode> = ArrayList()
+internal class KoruriNode: AudioProcessorNode {
+    val children: ArrayList<KoruriNode> = ArrayList()
 
     private var processor: SignalProcessor = ChainProcessor()
 
-    public fun setProcessor(processor: SignalProcessor) {
+    fun setProcessor(processor: SignalProcessor) {
         this.processor = processor
     }
 
-    public fun getNextSamples(numSamples: Int): FloatArray {
+    fun getNextSamples(numSamples: Int): FloatArray {
         val emptyData = FloatArray(numSamples)
         val output = process(emptyData)
         return output
     }
 
-    public fun process(input: FloatArray): FloatArray =
+    override fun process(input: FloatArray): FloatArray =
         processor.process(input, children)
 }

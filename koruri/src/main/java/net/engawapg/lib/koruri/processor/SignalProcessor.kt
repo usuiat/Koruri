@@ -16,7 +16,7 @@
 
 package net.engawapg.lib.koruri.processor
 
-import net.engawapg.lib.koruri.KoruriNode
+import net.engawapg.lib.koruri.AudioProcessorNode
 
 /**
  * Interface for audio signal processors.
@@ -26,8 +26,8 @@ public interface SignalProcessor {
      * Processes the input audio signal and returns the processed result.
      *
      * @param input The input audio data as a FloatArray.
-     * @param childrenNode The list of child nodes.
+     * @param children The list of child nodes.
      * @return The processed audio data as a FloatArray.
      */
-    public fun process(input: FloatArray, childrenNode: List<KoruriNode>): FloatArray
+    public fun process(input: FloatArray, children: List<AudioProcessorNode>): FloatArray
 }
