@@ -89,30 +89,20 @@ private fun MainScreen(
         ) {
             Text("Koruri Samples")
 
-            Button(
-                onClick = { onSampleSelect(Sample.SineWave) },
-            ) {
-                Text("Sine Wave")
-            }
-            Button(
-                onClick = { onSampleSelect(Sample.Instruments) },
-            ) {
-                Text("Instruments")
-            }
-            Button(
-                onClick = { onSampleSelect(Sample.Twinkle) },
-            ) {
-                Text("Twinkle Twinkle Little Star")
-            }
-            Button(
-                onClick = { onSampleSelect(Sample.Keyboard) },
-            ) {
-                Text("Keyboard")
-            }
-            Button(
-                onClick = { onSampleSelect(Sample.Synth) },
-            ) {
-                Text("Synthesizer")
+            val samples = listOf(
+                "Sine Wave" to Sample.SineWave,
+                "Instruments" to Sample.Instruments,
+                "Twinkle Twinkle Little Star" to Sample.Twinkle,
+                "Keyboard" to Sample.Keyboard,
+                "Synthesizer" to Sample.Synth,
+            )
+
+            samples.forEach { (name, sample) ->
+                Button(
+                    onClick = { onSampleSelect(sample) },
+                ) {
+                    Text(name)
+                }
             }
         }
     }
