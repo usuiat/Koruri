@@ -15,7 +15,7 @@ It enables you to describe audio processing declaratively using composable funct
 ## Requirements
 
 - Min SDK 26 or higher
-- Kotlin 2.2.0 or higher
+- Kotlin 2.0.21 or higher
 
 ## Usage
 
