@@ -1,5 +1,7 @@
 # Koruri
 
+<img width="320" height="320" alt="koruri_320px" src="https://github.com/user-attachments/assets/ce849baf-ba91-454d-a2fe-be81379d221f" />
+
 Koruri is a declarative audio processing library built using Jetpack Compose runtime.
 It enables you to describe audio processing declaratively using composable functions.
 
@@ -9,8 +11,13 @@ It enables you to describe audio processing declaratively using composable funct
 
 ## Demo
 
-- You can define waveforms and apply effects to produce various sounds.
-- You can play instrument-like sounds.
+You can define waveforms and apply effects to produce various sounds.
+
+
+
+https://github.com/user-attachments/assets/7364db6c-6bcd-4254-95ff-bdb551d72b43
+
+
 
 ## Requirements
 
@@ -35,7 +42,18 @@ dependencies {
 
 The latest version: <img alt="version badge" src="https://img.shields.io/github/v/release/usuiat/Koruri?filter=*.*.*">
 
-### Call Audio Composable Functions
+### Define audio processing with Composable functions
+
+Koruri's entry points are `KoruriContent()` or `setKoruriContent()`.
+Use `KoruriContent()` within UI composable functions, and `setKoruriContent()` elsewhere.
+
+In the entry point's `content`, you can write audio composable with the same notation as the UI composable.
+For sound sources, you can use `SineWave()`, `SquareWave()`, `InstrumentNote()`, and others.
+
+The state of the output audio can be managed using `State`.
+Changing the value of `State` triggers recomposition, causing the output audio to change.
+
+The following code is an example that plays a sine wave sound when the switch is turned on and allows you to change the frequency using a slider.
 
 ```Kotlin
 @Composable
@@ -65,14 +83,7 @@ fun KoruriSample() {
 }
 ```
 
-Koruri's entry points are `KoruriContent()` or `setKoruriContent()`.
-Use `KoruriContent()` within UI composable functions, and `setKoruriContent()` elsewhere.
-
-Then write the audio processing composable function in the entry point's `content`.
-For sound sources, you can use `SineWave()`, `SquareWave()`, `InstrumentNote()`, and others.
-
-The state of the output audio can be managed using `State`.
-Changing the value of `State` triggers recomposition, causing the output audio to change.
+https://github.com/user-attachments/assets/0bb11e5d-9efc-4910-b470-a069c1016e80
 
 For more detailed usage instructions, please refer to the [sample app](app/src/main/java/net/engawapg/app/koruri/).
 
