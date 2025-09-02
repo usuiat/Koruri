@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -24,6 +26,11 @@ plugins {
 
 kotlin {
     explicitApi()
+    compilerOptions {
+        languageVersion = KotlinVersion.KOTLIN_2_0
+        apiVersion = KotlinVersion.KOTLIN_2_0
+    }
+    coreLibrariesVersion = "2.0.21"
 }
 
 android {
