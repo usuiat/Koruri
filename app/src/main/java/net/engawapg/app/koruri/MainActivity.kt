@@ -25,12 +25,15 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -83,6 +87,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun MainScreen(
     onSampleSelect: (Sample) -> Unit,
@@ -101,6 +106,7 @@ private fun MainScreen(
                 painter = painterResource(R.drawable.koruri),
                 contentDescription = null,
                 modifier = Modifier
+                    .padding(top = 16.dp)
                     .size(200.dp)
                     .clip(RoundedCornerShape(20.dp))
                     .border(
@@ -119,8 +125,10 @@ private fun MainScreen(
             )
 
             samples.forEach { (name, sample) ->
-                Button(
+                OutlinedButton(
                     onClick = { onSampleSelect(sample) },
+                    shape = ButtonDefaults.squareShape,
+                    modifier = Modifier.fillMaxWidth(0.7f)
                 ) {
                     Text(name)
                 }
@@ -140,4 +148,12 @@ private sealed interface Sample {
     data object Keyboard: Sample
     @Serializable
     data object Synth: Sample
+}
+
+@Preview
+@Composable
+private fun MainScreenPreview() {
+    KoruriTheme {
+        MainScreen(onSampleSelect = {})
+    }
 }
