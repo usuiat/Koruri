@@ -32,7 +32,7 @@ import net.engawapg.lib.koruri.audio.Block
  * Changing gate resets the envelope.
  */
 @Composable
-public fun Envelope(
+public fun VolumeEnvelope(
     attack: () -> Float,
     decay: () -> Float,
     sustain: () -> Float,
@@ -40,7 +40,7 @@ public fun Envelope(
     gate: () -> Boolean
 ) {
     Block(
-        signalProcessor = EnvelopeGenerator(attack, decay, sustain, release, gate)
+        signalProcessor = VolumeEnvelopeProcessor(attack, decay, sustain, release, gate)
     )
 }
 
@@ -54,7 +54,7 @@ public fun Envelope(
  * @param gate The gate signal (note on/off).
  */
 @Composable
-public fun Envelope(
+public fun VolumeEnvelope(
     attack: Float,
     decay: Float,
     sustain: Float,
@@ -62,11 +62,11 @@ public fun Envelope(
     gate: Boolean
 ) {
     Block(
-        signalProcessor = EnvelopeGenerator({ attack }, { decay }, { sustain }, { release }, { gate })
+        signalProcessor = VolumeEnvelopeProcessor({ attack }, { decay }, { sustain }, { release }, { gate })
     )
 }
 
-private class EnvelopeGenerator(
+private class VolumeEnvelopeProcessor(
     private val attack: () -> Float,
     private val decay: () -> Float,
     private val sustain: () -> Float,

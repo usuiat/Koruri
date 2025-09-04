@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import net.engawapg.lib.koruri.KoruriContent
 import net.engawapg.lib.koruri.processor.Chain
-import net.engawapg.lib.koruri.processor.Envelope
+import net.engawapg.lib.koruri.processor.VolumeEnvelope
 import net.engawapg.lib.koruri.processor.LowPassFilter
 import net.engawapg.lib.koruri.processor.SquareWave
 
@@ -358,7 +358,7 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                 frequency = { frequency },
                 pulseWidth = { pulseWidth }
             )
-            Envelope(
+            VolumeEnvelope(
                 attack = { attack },
                 decay = { decay },
                 sustain = { sustain },
