@@ -16,28 +16,22 @@
 
 package net.engawapg.lib.koruri.processor
 
-internal class EnvelopeModulator(
-) {
-    private var envelope = 0f
-    private var attack = 0f
-    private var decay = 0f
-    private var sustain = 1f
-    private var release = 0f
-    private var gate = false
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.setValue
 
-    fun setParameters(
-        attack: Float,
-        decay: Float,
-        sustain: Float,
-        release: Float,
-        gate: Boolean,
-    ) {
-        this.attack = attack
-        this.decay = decay
-        this.sustain = sustain
-        this.release = release
-        this.gate = gate
-    }
+public class EnvelopeModulator(
+    attack: Float = 0f,
+    decay: Float = 0f,
+    sustain: Float = 1f,
+    release: Float = 0f,
+    public var gate: () -> Boolean,
+) : Modulator {
+
+    public var attack: Float by mutableFloatStateOf(attack)
+    public var decay: Float by mutableFloatStateOf(decay)
+    public var sustain: Float by mutableFloatStateOf(sustain)
+    public var release: Float by mutableFloatStateOf(release)
 
     private enum class Phase {
         Attack, Decay, Sustain, Release, Idle
@@ -48,8 +42,10 @@ internal class EnvelopeModulator(
     private var releaseLevel = 0f
     private val deltaTime = 1f / 48000f
     private var previousGate = false
+    private var envelope: Float = 0f
 
-    fun calculateValue(): Float {
+    override fun modulate(): Float {
+        val gate = gate()
         if (gate && !previousGate) {
             // Gate on - start attack phase
             phase = Phase.Attack

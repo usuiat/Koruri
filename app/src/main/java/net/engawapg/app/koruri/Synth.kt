@@ -43,22 +43,19 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import net.engawapg.lib.koruri.KoruriContent
 import net.engawapg.lib.koruri.processor.Chain
-import net.engawapg.lib.koruri.processor.VolumeEnvelope
+import net.engawapg.lib.koruri.processor.EnvelopeModulator
 import net.engawapg.lib.koruri.processor.LowPassFilter
 import net.engawapg.lib.koruri.processor.SquareWave
+import net.engawapg.lib.koruri.processor.VolumeModulation
 
 @Composable
 internal fun SynthScreen(modifier: Modifier = Modifier) {
     var isPlaying by remember { mutableStateOf(false) }
-    val baseFrequency = 65.41f // C2の音に変更（C3の半分の周波数）
+    val baseFrequency = 65.41f
     var bpm by remember { mutableFloatStateOf(120f) }
-    var pulseWidth by remember { mutableFloatStateOf(0f) }
 
     var gate by remember { mutableStateOf(false) }
-    var frequency by remember { mutableFloatStateOf(65.41f) }
-
-    // エンベロープ値を計算する関数
-    var envelopeValue by remember { mutableFloatStateOf(0f) }
+    var frequency by remember { mutableFloatStateOf(baseFrequency) }
 
     val arpeggioPattern = listOf(
         1.0f,    // C
@@ -73,90 +70,23 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
     var currentStep by remember { mutableIntStateOf(0) }
 
     // ADSR parameters
-    var attack by remember { mutableFloatStateOf(0.01f) } // 非常に短いアタック
-    var decay by remember { mutableFloatStateOf(0.15f) }  // 短いディケイ
-    var sustain by remember { mutableFloatStateOf(0.4f) } // 低めのサスティン
-    var release by remember { mutableFloatStateOf(0.01f) } // 短いリリース
+    val envelope = remember {
+        EnvelopeModulator(
+            attack = 0.03f,
+            decay = 0.20f,
+            sustain = 0.5f,
+            release = 0.3f,
+            gate = { gate }
+        )
+    }
 
     // LPF parameters
-    var cutoff by remember { mutableFloatStateOf(20000f) }  // 少し高めのカットオフ
-    var resonance by remember { mutableFloatStateOf(0.1f) }  // 高めのレゾナンス
+    var cutoff by remember { mutableFloatStateOf(3000f) }
+    var resonance by remember { mutableFloatStateOf(0.3f) }
 
     // Pulse Width Modulation parameters
-    var basePulseWidth by remember { mutableFloatStateOf(0f) }      // ベースのPulse Width
+    var pulseWidth by remember { mutableFloatStateOf(0f) }      // ベースのPulse Width
     var pwmAmount by remember { mutableFloatStateOf(0.0f) }         // モジュレーション量
-
-    // エンベロープジェネレーターの状態
-    var envelopePhase by remember { mutableStateOf("Idle") }
-    var envelopeTime by remember { mutableFloatStateOf(0f) }
-    var releaseLevel by remember { mutableFloatStateOf(0f) }
-    var previousGate by remember { mutableStateOf(false) }
-
-    // エンベロープ値をリアルタイムで更新
-    LaunchedEffect(gate, attack, decay, sustain, release) {
-        while (true) {
-            val currentGate = gate
-            val deltaTime = 0.016f // 約60FPS
-
-            // ゲート状態の変化を検出
-            if (currentGate && !previousGate) {
-                // ゲートオン - アタックフェーズ開始
-                envelopePhase = "Attack"
-                envelopeTime = 0f
-                previousGate = true
-            } else if (!currentGate && previousGate) {
-                // ゲートオフ - リリースフェーズ開始
-                if (envelopePhase != "Idle") {
-                    envelopePhase = "Release"
-                    envelopeTime = 0f
-                    releaseLevel = envelopeValue
-                }
-                previousGate = false
-            }
-
-            // エンベロープ値を計算
-            when (envelopePhase) {
-                "Attack" -> {
-                    envelopeValue = envelopeTime / attack
-                    envelopeTime += deltaTime
-                    if (envelopeTime >= attack) {
-                        envelopePhase = "Decay"
-                        envelopeTime = 0f
-                    }
-                }
-                "Decay" -> {
-                    val decayProgress = envelopeTime / decay
-                    envelopeValue = 1f - decayProgress * (1f - sustain)
-                    envelopeTime += deltaTime
-                    if (envelopeTime >= decay) {
-                        envelopePhase = "Sustain"
-                        envelopeValue = sustain
-                    }
-                }
-                "Sustain" -> {
-                    envelopeValue = sustain
-                }
-                "Release" -> {
-                    val releaseProgress = envelopeTime / release
-                    envelopeValue = releaseLevel * (1f - releaseProgress)
-                    envelopeTime += deltaTime
-                    if (envelopeTime >= release) {
-                        envelopePhase = "Idle"
-                        envelopeValue = 0f
-                    }
-                }
-                else -> {
-                    envelopeValue = 0f
-                }
-            }
-
-            // Pulse Widthをモジュレート
-            pulseWidth = basePulseWidth + (envelopeValue * pwmAmount * 2f - pwmAmount)
-            pulseWidth = pulseWidth.coerceIn(-1f, 1f) // 範囲制限
-
-            delay(16) // 約60FPS
-        }
-    }
 
     LaunchedEffect(isPlaying, bpm) {
         if (isPlaying) {
@@ -205,28 +135,6 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                 Text(if (isPlaying) "Stop" else "Play")
             }
 
-
-//            // BPM control
-//            Card(
-//                modifier = Modifier.fillMaxWidth()
-//            ) {
-//                Column(
-//                    modifier = Modifier.padding(16.dp)
-//                ) {
-//                    Text(
-//                        text = "BPM (Beats Per Minute)",
-//                        style = MaterialTheme.typography.titleMedium
-//                    )
-//                    Text("${bpm.toInt()} BPM")
-//                    Slider(
-//                        value = bpm,
-//                        onValueChange = { bpm = it },
-//                        valueRange = 0f..240f,
-//                        modifier = Modifier.fillMaxWidth()
-//                    )
-//                }
-//            }
-
             // ADSR controls
             Card(
                 modifier = Modifier.fillMaxWidth()
@@ -241,37 +149,37 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                     )
 
                     // Attack
-                    Text("Attack: ${"%.2f".format(attack)}s")
+                    Text("Attack: ${"%.2f".format(envelope.attack)}s")
                     Slider(
-                        value = attack,
-                        onValueChange = { attack = it },
+                        value = envelope.attack,
+                        onValueChange = { envelope.attack = it },
                         valueRange = 0.01f..2.0f,
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     // Decay
-                    Text("Decay: ${"%.2f".format(decay)}s")
+                    Text("Decay: ${"%.2f".format(envelope.decay)}s")
                     Slider(
-                        value = decay,
-                        onValueChange = { decay = it },
+                        value = envelope.decay,
+                        onValueChange = { envelope.decay = it },
                         valueRange = 0.01f..2.0f,
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     // Sustain
-                    Text("Sustain: ${"%.2f".format(sustain)}")
+                    Text("Sustain: ${"%.2f".format(envelope.sustain)}")
                     Slider(
-                        value = sustain,
-                        onValueChange = { sustain = it },
+                        value = envelope.sustain,
+                        onValueChange = { envelope.sustain = it },
                         valueRange = 0.0f..1.0f,
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     // Release
-                    Text("Release: ${"%.2f".format(release)}s")
+                    Text("Release: ${"%.2f".format(envelope.release)}s")
                     Slider(
-                        value = release,
-                        onValueChange = { release = it },
+                        value = envelope.release,
+                        onValueChange = { envelope.release = it },
                         valueRange = 0.01f..3.0f,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -292,10 +200,10 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                     )
 
                     // Base Pulse Width
-                    Text("Base Pulse Width: ${"%.2f".format(basePulseWidth)}")
+                    Text("Base Pulse Width: ${"%.2f".format(pulseWidth)}")
                     Slider(
-                        value = basePulseWidth,
-                        onValueChange = { basePulseWidth = it },
+                        value = pulseWidth,
+                        onValueChange = { pulseWidth = it },
                         valueRange = -1f..1f,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -307,12 +215,6 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                         onValueChange = { pwmAmount = it },
                         valueRange = 0f..1f,
                         modifier = Modifier.fillMaxWidth()
-                    )
-
-                    // Current modulated pulse width display
-                    Text(
-                        text = "Current PW: ${"%.2f".format(pulseWidth)}",
-                        style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
@@ -356,15 +258,11 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
         Chain {
             SquareWave(
                 frequency = { frequency },
-                pulseWidth = { pulseWidth }
+                pulseWidth = { pulseWidth },
+                pulseWidthModulator = envelope,
+                pulseWidthModulationAmount = { pwmAmount }
             )
-            VolumeEnvelope(
-                attack = { attack },
-                decay = { decay },
-                sustain = { sustain },
-                release = { release },
-                gate = { gate }
-            )
+            VolumeModulation(volumeModulator = envelope)
             LowPassFilter(
                 cutoff = { cutoff },
                 resonance = { resonance }
