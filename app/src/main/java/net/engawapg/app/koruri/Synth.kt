@@ -58,14 +58,10 @@ import net.engawapg.lib.koruri.processor.VolumeEnvelope
 internal fun SynthScreen(modifier: Modifier = Modifier) {
     var isPlaying by remember { mutableStateOf(false) }
     val baseFrequency = 65.41f /* C2 */ * 2
-    var bpm by remember { mutableFloatStateOf(120f) }
-    var pulseWidth by remember { mutableFloatStateOf(0f) }
+    val bpm = 120f
 
     var gate by remember { mutableStateOf(false) }
     var frequency by remember { mutableFloatStateOf(65.41f) }
-
-    // エンベロープ値を計算する関数
-    var envelopeValue by remember { mutableFloatStateOf(0f) }
 
     val arpeggioPattern = listOf(
         1.0f,    // C
@@ -90,112 +86,69 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
     var resonance by remember { mutableFloatStateOf(0.1f) }  // 高めのレゾナンス
 
     // Pulse Width Modulation parameters
-    var basePulseWidth by remember { mutableFloatStateOf(0f) }      // ベースのPulse Width
+    var pulseWidth by remember { mutableFloatStateOf(0f) }      // ベースのPulse Width
     var pwmAmount by remember { mutableFloatStateOf(0.0f) }         // モジュレーション量
-
-    // エンベロープジェネレーターの状態
-    var envelopePhase by remember { mutableStateOf("Idle") }
-    var envelopeTime by remember { mutableFloatStateOf(0f) }
-    var releaseLevel by remember { mutableFloatStateOf(0f) }
-    var previousGate by remember { mutableStateOf(false) }
 
     // LFO frequency parameter
     var lfoFreq by remember { mutableFloatStateOf(1.0f) } // デフォルト1Hz
 
-    // エンベロープ値をリアルタイムで更新
-    LaunchedEffect(gate, attack, decay, sustain, release) {
-        while (true) {
-            val currentGate = gate
-            val deltaTime = 0.016f // 約60FPS
-
-            // ゲート状態の変化を検出
-            if (currentGate && !previousGate) {
-                // ゲートオン - アタックフェーズ開始
-                envelopePhase = "Attack"
-                envelopeTime = 0f
-                previousGate = true
-            } else if (!currentGate && previousGate) {
-                // ゲートオフ - リリースフェーズ開始
-                if (envelopePhase != "Idle") {
-                    envelopePhase = "Release"
-                    envelopeTime = 0f
-                    releaseLevel = envelopeValue
-                }
-                previousGate = false
-            }
-
-            // エンベロープ値を計算
-            when (envelopePhase) {
-                "Attack" -> {
-                    envelopeValue = envelopeTime / attack
-                    envelopeTime += deltaTime
-                    if (envelopeTime >= attack) {
-                        envelopePhase = "Decay"
-                        envelopeTime = 0f
-                    }
-                }
-                "Decay" -> {
-                    val decayProgress = envelopeTime / decay
-                    envelopeValue = 1f - decayProgress * (1f - sustain)
-                    envelopeTime += deltaTime
-                    if (envelopeTime >= decay) {
-                        envelopePhase = "Sustain"
-                        envelopeValue = sustain
-                    }
-                }
-                "Sustain" -> {
-                    envelopeValue = sustain
-                }
-                "Release" -> {
-                    val releaseProgress = envelopeTime / release
-                    envelopeValue = releaseLevel * (1f - releaseProgress)
-                    envelopeTime += deltaTime
-                    if (envelopeTime >= release) {
-                        envelopePhase = "Idle"
-                        envelopeValue = 0f
-                    }
-                }
-                else -> {
-                    envelopeValue = 0f
-                }
-            }
-
-            // Pulse Widthをモジュレート
-            pulseWidth = basePulseWidth + (envelopeValue * pwmAmount * 2f - pwmAmount)
-            pulseWidth = pulseWidth.coerceIn(-1f, 1f) // 範囲制限
-
-            delay(16) // 約60FPS
-        }
-    }
-
-    LaunchedEffect(isPlaying, bpm) {
+    LaunchedEffect(isPlaying) {
         if (isPlaying) {
-            if (bpm == 0f) {
-                // BPM=0なら最初の音を常時再生
-                frequency = baseFrequency * arpeggioPattern[0]
+            currentStep = 0
+            // アルペジオパターンをループ
+            while (true) {
+                val beatDuration = (60000 / bpm).toLong() // BPMからミリ秒計算
+                val gateDuration = (beatDuration * 0.6).toLong() // 拍の60%をゲートオン（よりパンチのある音）
+
+                // 現在のステップに対応する周波数を設定
+                frequency = baseFrequency * arpeggioPattern[currentStep]
                 gate = true
-            } else {
-                // アルペジオパターンをループ
-                while (true) {
-                    val beatDuration = (60000 / bpm).toLong() // BPMからミリ秒計算
-                    val gateDuration = (beatDuration * 0.6).toLong() // 拍の60%をゲートオン（よりパンチのある音）
+                delay(gateDuration)
+                gate = false
+                delay(beatDuration - gateDuration)
 
-                    // 現在のステップに対応する周波数を設定
-                    frequency = baseFrequency * arpeggioPattern[currentStep]
-                    gate = true
-                    delay(gateDuration)
-                    gate = false
-                    delay(beatDuration - gateDuration)
-
-                    // 次のステップに進む
-                    currentStep = (currentStep + 1) % arpeggioPattern.size
-                }
+                // 次のステップに進む
+                currentStep = (currentStep + 1) % arpeggioPattern.size
             }
         } else {
             gate = false
         }
     }
 
+    var lfo by remember { mutableFloatStateOf(0f) }
+    LaunchedEffect(lfoFreq) {
+        var lastTime = System.nanoTime()
+        var phase = 0.0
+        while (true) {
+            withFrameNanos { t ->
+                val deltaTime = (t - lastTime) / 1_000_000_000.0 // 秒
+                lastTime = t
+                phase += 2 * Math.PI * lfoFreq * deltaTime
+                if (phase >= 2 * Math.PI) phase -= 2 * Math.PI
+                lfo = kotlin.math.sin(phase).toFloat()
+            }
+        }
+    }
+
+    KoruriContent {
+        Chain {
+            SquareWave(
+                frequency = { frequency },
+                pulseWidth = { pulseWidth + lfo * pwmAmount * 0.5f }
+            )
+            VolumeEnvelope(
+                attack = { attack },
+                decay = { decay },
+                sustain = { sustain },
+                release = { release },
+                gate = { gate }
+            )
+            LowPassFilter(
+                cutoff = { cutoff },
+                resonance = { resonance }
+            )
+        }
+    }
 
     Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -308,10 +261,10 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                         )
 
                         // Base Pulse Width
-                        Text("Base Pulse Width: ${"%.2f".format(basePulseWidth)}")
+                        Text("Base Pulse Width: ${"%.2f".format(pulseWidth)}")
                         Slider(
-                            value = basePulseWidth,
-                            onValueChange = { basePulseWidth = it },
+                            value = pulseWidth,
+                            onValueChange = { pulseWidth = it },
                             valueRange = -1f..1f,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -323,12 +276,6 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                             onValueChange = { pwmAmount = it },
                             valueRange = 0f..1f,
                             modifier = Modifier.fillMaxWidth()
-                        )
-
-                        // Current modulated pulse width display
-                        Text(
-                            text = "Current PW: ${"%.2f".format(pulseWidth)}",
-                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }
@@ -388,42 +335,6 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                     }
                 }
             }
-        }
-    }
-
-
-    var lfo by remember { mutableFloatStateOf(0f) }
-    LaunchedEffect(lfoFreq) {
-        var lastTime = System.nanoTime()
-        var phase = 0.0
-        while (true) {
-            withFrameNanos { t ->
-                val deltaTime = (t - lastTime) / 1_000_000_000.0 // 秒
-                lastTime = t
-                phase += 2 * Math.PI * lfoFreq * deltaTime
-                if (phase >= 2 * Math.PI) phase -= 2 * Math.PI
-                lfo = kotlin.math.sin(phase).toFloat()
-            }
-        }
-    }
-
-    KoruriContent {
-        Chain {
-            SquareWave(
-                frequency = { frequency },
-                pulseWidth = { pulseWidth + lfo * pwmAmount * 0.5f }
-            )
-            VolumeEnvelope(
-                attack = { attack },
-                decay = { decay },
-                sustain = { sustain },
-                release = { release },
-                gate = { gate }
-            )
-            LowPassFilter(
-                cutoff = { cutoff },
-                resonance = { resonance }
-            )
         }
     }
 }
