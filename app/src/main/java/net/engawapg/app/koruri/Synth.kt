@@ -57,7 +57,7 @@ import net.engawapg.lib.koruri.processor.VolumeEnvelope
 @Composable
 internal fun SynthScreen(modifier: Modifier = Modifier) {
     var isPlaying by remember { mutableStateOf(false) }
-    val baseFrequency = 65.41f /* C2 */ * 2
+    val baseFrequency = 65.41f /* C2 */
     val bpm = 120f
 
     var gate by remember { mutableStateOf(false) }
@@ -116,7 +116,7 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
     }
 
     var lfo by remember { mutableFloatStateOf(0f) }
-    LaunchedEffect(lfoFreq) {
+    LaunchedEffect(lfoFreq, gate) {
         var lastTime = System.nanoTime()
         var phase = 0.0
         while (true) {
