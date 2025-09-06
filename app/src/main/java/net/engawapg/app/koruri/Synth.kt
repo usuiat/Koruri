@@ -42,7 +42,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -53,6 +52,7 @@ import net.engawapg.lib.koruri.processor.Chain
 import net.engawapg.lib.koruri.processor.LowPassFilter
 import net.engawapg.lib.koruri.processor.SquareWave
 import net.engawapg.lib.koruri.processor.VolumeEnvelope
+import net.engawapg.lib.koruri.processor.produceLfo
 
 @Composable
 internal fun SynthScreen(modifier: Modifier = Modifier) {
@@ -115,22 +115,8 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
         }
     }
 
-    var lfo by remember { mutableFloatStateOf(0f) }
-    LaunchedEffect(lfoFreq, gate) {
-        var lastTime = System.nanoTime()
-        var phase = 0.0
-        while (true) {
-            withFrameNanos { t ->
-                val deltaTime = (t - lastTime) / 1_000_000_000.0 // 秒
-                lastTime = t
-                phase += 2 * Math.PI * lfoFreq * deltaTime
-                if (phase >= 2 * Math.PI) phase -= 2 * Math.PI
-                lfo = kotlin.math.sin(phase).toFloat()
-            }
-        }
-    }
-
     KoruriContent {
+        val lfo by produceLfo(frequency = lfoFreq, gate = gate)
         Chain {
             SquareWave(
                 frequency = { frequency },
