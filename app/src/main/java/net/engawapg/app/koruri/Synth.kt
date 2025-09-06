@@ -16,11 +16,16 @@
 
 package net.engawapg.app.koruri
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -37,20 +42,22 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import net.engawapg.lib.koruri.KoruriContent
 import net.engawapg.lib.koruri.processor.Chain
-import net.engawapg.lib.koruri.processor.VolumeEnvelope
 import net.engawapg.lib.koruri.processor.LowPassFilter
 import net.engawapg.lib.koruri.processor.SquareWave
+import net.engawapg.lib.koruri.processor.VolumeEnvelope
 
 @Composable
 internal fun SynthScreen(modifier: Modifier = Modifier) {
     var isPlaying by remember { mutableStateOf(false) }
-    val baseFrequency = 65.41f // C2の音に変更（C3の半分の周波数）
+    val baseFrequency = 65.41f /* C2 */ * 2
     var bpm by remember { mutableFloatStateOf(120f) }
     var pulseWidth by remember { mutableFloatStateOf(0f) }
 
@@ -91,6 +98,9 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
     var envelopeTime by remember { mutableFloatStateOf(0f) }
     var releaseLevel by remember { mutableFloatStateOf(0f) }
     var previousGate by remember { mutableStateOf(false) }
+
+    // LFO frequency parameter
+    var lfoFreq by remember { mutableFloatStateOf(1.0f) } // デフォルト1Hz
 
     // エンベロープ値をリアルタイムで更新
     LaunchedEffect(gate, attack, decay, sustain, release) {
@@ -189,165 +199,210 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
 
     Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
         Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(16.dp)
-                .verticalScroll(rememberScrollState())
         ) {
-            // Play/Stop button
-            Button(
-                onClick = { isPlaying = !isPlaying },
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(if (isPlaying) "Stop" else "Play")
-            }
+            Row {
+                // Large touch area for playing note
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .background(MaterialTheme.colorScheme.primary)
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onPress = {
+                                    frequency = baseFrequency
+                                    gate = true
+                                    try {
+                                        awaitRelease()
+                                    } finally {
+                                        gate = false
+                                    }
+                                }
+                            )
+                        }
+                )
 
-
-//            // BPM control
-//            Card(
-//                modifier = Modifier.fillMaxWidth()
-//            ) {
-//                Column(
-//                    modifier = Modifier.padding(16.dp)
-//                ) {
-//                    Text(
-//                        text = "BPM (Beats Per Minute)",
-//                        style = MaterialTheme.typography.titleMedium
-//                    )
-//                    Text("${bpm.toInt()} BPM")
-//                    Slider(
-//                        value = bpm,
-//                        onValueChange = { bpm = it },
-//                        valueRange = 0f..240f,
-//                        modifier = Modifier.fillMaxWidth()
-//                    )
-//                }
-//            }
-
-            // ADSR controls
-            Card(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
+                // Play/Stop button
+                Button(
+                    onClick = { isPlaying = !isPlaying },
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    Text(
-                        text = "ADSR Envelope",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-
-                    // Attack
-                    Text("Attack: ${"%.2f".format(attack)}s")
-                    Slider(
-                        value = attack,
-                        onValueChange = { attack = it },
-                        valueRange = 0.01f..2.0f,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    // Decay
-                    Text("Decay: ${"%.2f".format(decay)}s")
-                    Slider(
-                        value = decay,
-                        onValueChange = { decay = it },
-                        valueRange = 0.01f..2.0f,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    // Sustain
-                    Text("Sustain: ${"%.2f".format(sustain)}")
-                    Slider(
-                        value = sustain,
-                        onValueChange = { sustain = it },
-                        valueRange = 0.0f..1.0f,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    // Release
-                    Text("Release: ${"%.2f".format(release)}s")
-                    Slider(
-                        value = release,
-                        onValueChange = { release = it },
-                        valueRange = 0.01f..3.0f,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    Text(if (isPlaying) "Stop" else "Play")
                 }
             }
 
-            // Pulse Width Modulation controls
-            Card(
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
+
+                // ADSR controls
+                Card(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = "Pulse Width Modulation",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "ADSR Envelope",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
 
-                    // Base Pulse Width
-                    Text("Base Pulse Width: ${"%.2f".format(basePulseWidth)}")
-                    Slider(
-                        value = basePulseWidth,
-                        onValueChange = { basePulseWidth = it },
-                        valueRange = -1f..1f,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                        // Attack
+                        Text("Attack: ${"%.2f".format(attack)}s")
+                        Slider(
+                            value = attack,
+                            onValueChange = { attack = it },
+                            valueRange = 0.01f..2.0f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
 
-                    // PWM Amount
-                    Text("PWM Amount: ${"%.2f".format(pwmAmount)}")
-                    Slider(
-                        value = pwmAmount,
-                        onValueChange = { pwmAmount = it },
-                        valueRange = 0f..1f,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                        // Decay
+                        Text("Decay: ${"%.2f".format(decay)}s")
+                        Slider(
+                            value = decay,
+                            onValueChange = { decay = it },
+                            valueRange = 0.01f..2.0f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
 
-                    // Current modulated pulse width display
-                    Text(
-                        text = "Current PW: ${"%.2f".format(pulseWidth)}",
-                        style = MaterialTheme.typography.bodySmall
-                    )
+                        // Sustain
+                        Text("Sustain: ${"%.2f".format(sustain)}")
+                        Slider(
+                            value = sustain,
+                            onValueChange = { sustain = it },
+                            valueRange = 0.0f..1.0f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        // Release
+                        Text("Release: ${"%.2f".format(release)}s")
+                        Slider(
+                            value = release,
+                            onValueChange = { release = it },
+                            valueRange = 0.01f..3.0f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+
+                // Pulse Width Modulation controls
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Pulse Width Modulation",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
+                        // Base Pulse Width
+                        Text("Base Pulse Width: ${"%.2f".format(basePulseWidth)}")
+                        Slider(
+                            value = basePulseWidth,
+                            onValueChange = { basePulseWidth = it },
+                            valueRange = -1f..1f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        // PWM Amount
+                        Text("PWM Amount: ${"%.2f".format(pwmAmount)}")
+                        Slider(
+                            value = pwmAmount,
+                            onValueChange = { pwmAmount = it },
+                            valueRange = 0f..1f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        // Current modulated pulse width display
+                        Text(
+                            text = "Current PW: ${"%.2f".format(pulseWidth)}",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+
+                // LPF controls
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Low Pass Filter",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
+                        // Cutoff
+                        Text("Cutoff: ${"%.1f".format(cutoff)} Hz")
+                        Slider(
+                            value = cutoff,
+                            onValueChange = { cutoff = it },
+                            valueRange = 20f..20000f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        // Resonance
+                        Text("Resonance: ${"%.2f".format(resonance)}")
+                        Slider(
+                            value = resonance,
+                            onValueChange = { resonance = it },
+                            valueRange = 0.1f..10f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+
+                // LFO frequency control
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "LFO Frequency",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        Text("LFO: ${"%.2f".format(lfoFreq)} Hz")
+                        Slider(
+                            value = lfoFreq,
+                            onValueChange = { lfoFreq = it },
+                            valueRange = 0.1f..10f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
+        }
+    }
 
-            // LPF controls
-            Card(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(
-                        text = "Low Pass Filter",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
 
-                    // Cutoff
-                    Text("Cutoff: ${"%.1f".format(cutoff)} Hz")
-                    Slider(
-                        value = cutoff,
-                        onValueChange = { cutoff = it },
-                        valueRange = 20f..20000f,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    // Resonance
-                    Text("Resonance: ${"%.2f".format(resonance)}")
-                    Slider(
-                        value = resonance,
-                        onValueChange = { resonance = it },
-                        valueRange = 0.1f..10f,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+    var lfo by remember { mutableFloatStateOf(0f) }
+    LaunchedEffect(lfoFreq) {
+        var lastTime = System.nanoTime()
+        var phase = 0.0
+        while (true) {
+            withFrameNanos { t ->
+                val deltaTime = (t - lastTime) / 1_000_000_000.0 // 秒
+                lastTime = t
+                phase += 2 * Math.PI * lfoFreq * deltaTime
+                if (phase >= 2 * Math.PI) phase -= 2 * Math.PI
+                lfo = kotlin.math.sin(phase).toFloat()
             }
         }
     }
@@ -356,7 +411,7 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
         Chain {
             SquareWave(
                 frequency = { frequency },
-                pulseWidth = { pulseWidth }
+                pulseWidth = { pulseWidth + lfo * pwmAmount * 0.5f }
             )
             VolumeEnvelope(
                 attack = { attack },
