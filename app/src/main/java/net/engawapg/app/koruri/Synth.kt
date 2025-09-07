@@ -38,7 +38,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -50,6 +49,7 @@ import kotlinx.coroutines.delay
 import net.engawapg.lib.koruri.KoruriContent
 import net.engawapg.lib.koruri.processor.Chain
 import net.engawapg.lib.koruri.processor.LowPassFilter
+import net.engawapg.lib.koruri.processor.Pitch
 import net.engawapg.lib.koruri.processor.SquareWave
 import net.engawapg.lib.koruri.processor.VolumeEnvelope
 import net.engawapg.lib.koruri.processor.produceLfo
@@ -57,23 +57,8 @@ import net.engawapg.lib.koruri.processor.produceLfo
 @Composable
 internal fun SynthScreen(modifier: Modifier = Modifier) {
     var isPlaying by remember { mutableStateOf(false) }
-    val baseFrequency = 65.41f /* C2 */
-    val bpm = 120f
-
     var gate by remember { mutableStateOf(false) }
     var frequency by remember { mutableFloatStateOf(65.41f) }
-
-    val arpeggioPattern = listOf(
-        1.0f,    // C
-        1.5f,    // G
-        1.681f,  // Am
-        1.26f,   // Em
-        1.334f,  // F
-        1.0f,    // C
-        1.334f,  // F
-        1.5f     // G
-    )
-    var currentStep by remember { mutableIntStateOf(0) }
 
     // ADSR parameters
     var attack by remember { mutableFloatStateOf(0.01f) } // 非常に短いアタック
@@ -92,31 +77,21 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
     // LFO frequency parameter
     var lfoFreq by remember { mutableFloatStateOf(1.0f) } // デフォルト1Hz
 
-    LaunchedEffect(isPlaying) {
-        if (isPlaying) {
-            currentStep = 0
-            // アルペジオパターンをループ
-            while (true) {
-                val beatDuration = (60000 / bpm).toLong() // BPMからミリ秒計算
-                val gateDuration = (beatDuration * 0.6).toLong() // 拍の60%をゲートオン（よりパンチのある音）
-
-                // 現在のステップに対応する周波数を設定
-                frequency = baseFrequency * arpeggioPattern[currentStep]
-                gate = true
-                delay(gateDuration)
-                gate = false
-                delay(beatDuration - gateDuration)
-
-                // 次のステップに進む
-                currentStep = (currentStep + 1) % arpeggioPattern.size
-            }
-        } else {
-            gate = false
-        }
-    }
-
     KoruriContent {
+        ArpeggioLoop(
+            pattern = listOf(
+                Pitch.C4, Pitch.G4, Pitch.A4, Pitch.E4,
+                Pitch.F4, Pitch.C4, Pitch.F4, Pitch.G4
+            ),
+            bpm = 120f,
+            play = isPlaying
+        ) { newPitch, newGate ->
+            frequency = newPitch.frequency
+            gate = newGate
+        }
+
         val lfo by produceLfo(frequency = lfoFreq, gate = gate)
+
         Chain {
             SquareWave(
                 frequency = { frequency },
@@ -153,7 +128,7 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                         .pointerInput(Unit) {
                             detectTapGestures(
                                 onPress = {
-                                    frequency = baseFrequency
+                                    frequency = Pitch.C4.frequency
                                     gate = true
                                     try {
                                         awaitRelease()
@@ -321,6 +296,37 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ArpeggioLoop(
+    pattern: List<Pitch>,
+    bpm: Float,
+    play: Boolean,
+    gateDurationRatio: Float = 0.6f,
+    onStepChange: (pitch: Pitch, gate: Boolean) -> Unit,
+) {
+    LaunchedEffect(play) {
+        if (play) {
+            var currentStep = 0
+            // アルペジオパターンをループ
+            while (true) {
+                val beatDuration = (60000 / bpm).toLong() // BPMからミリ秒計算
+                val gateDuration = (beatDuration * gateDurationRatio).toLong() // 拍の60%をゲートオン（よりパンチのある音）
+
+                // 現在のステップに対応する周波数を設定
+                onStepChange(pattern[currentStep], true)
+                delay(gateDuration)
+                onStepChange(pattern[currentStep], false)
+                delay(beatDuration - gateDuration)
+
+                // 次のステップに進む
+                currentStep = (currentStep + 1) % pattern.size
+            }
+        } else {
+            onStepChange(Pitch.Silence, false)
         }
     }
 }
