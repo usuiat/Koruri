@@ -26,8 +26,8 @@ import kotlin.math.sin
  * Composable for generating a sine wave.
  * Produces a sine wave signal with specified amplitude and frequency.
  *
- * @param amplitude The amplitude of the sine wave.
- * @param frequency The frequency of the sine wave.
+ * @param amplitude The amplitude of the sine wave. The value should be between 0.0 and 1.0.
+ * @param frequency The frequency of the sine wave in Hz.
  */
 @Composable
 public fun SineWave(amplitude: Float = 0.5f, frequency: Float) {
@@ -38,8 +38,8 @@ public fun SineWave(amplitude: Float = 0.5f, frequency: Float) {
  * Composable for generating a sine wave.
  * Produces a sine wave signal with specified amplitude and dynamic frequency.
  *
- * @param amplitude The amplitude of the sine wave.
- * @param frequency A lambda returning the current frequency of the sine wave.
+ * @param amplitude The amplitude of the sine wave. The value should be between 0.0 and 1.0.
+ * @param frequency A lambda returning the current frequency of the sine wave in Hz.
  */
 @Composable
 public fun SineWave(amplitude: Float = 0.5f, frequency: () -> Float) {

@@ -26,8 +26,8 @@ import kotlin.math.sin
 /**
  * Composable for applying a low-pass filter to the audio signal.
  *
- * @param cutoff The cutoff frequency of the filter.
- * @param resonance The resonance (Q factor) of the filter.
+ * @param cutoff The cutoff frequency of the filter in Hz.
+ * @param resonance The resonance (Q factor) of the filter. Controls the peak at the cutoff frequency. A value of 1.0 is neutral. Higher values create a more pronounced peak. A typical range is 0.1 to 20.
  */
 @Composable
 public fun LowPassFilter(
@@ -42,8 +42,8 @@ public fun LowPassFilter(
 /**
  * Composable for applying a low-pass filter to the audio signal.
  *
- * @param cutoff A lambda returning the current cutoff frequency.
- * @param resonance A lambda returning the current resonance (Q factor).
+ * @param cutoff A lambda returning the current cutoff frequency in Hz.
+ * @param resonance A lambda returning the current resonance (Q factor). Controls the peak at the cutoff frequency. A value of 1.0 is neutral. Higher values create a more pronounced peak. A typical range is 0.1 to 20.
  */
 @Composable
 public fun LowPassFilter(

@@ -21,7 +21,7 @@ package net.engawapg.lib.koruri
  */
 public object KoruriAudioConfig {
     /**
-     * The buffer size used for audio processing in Koruri.
+     * The buffer size in frames used for audio processing in Koruri.
      */
     public const val BUFFER_SIZE: Int = 128
 }

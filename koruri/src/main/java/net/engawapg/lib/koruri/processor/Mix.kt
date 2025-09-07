@@ -22,6 +22,9 @@ import net.engawapg.lib.koruri.audio.Block
 
 /**
  * Composable for mixing multiple audio signals.
+ * It sums the audio signals from all child composables.
+ * Note that clipping may occur if the mixed signal exceeds the range of -1.0 to 1.0.
+ * To prevent clipping, consider using the `Volume` composable to adjust the level of the children or the mixed output.
  *
  * @param content The child composables to be mixed.
  */

@@ -24,12 +24,11 @@ import net.engawapg.lib.koruri.audio.Block
  * Composable for applying an ADSR envelope to the audio signal.
  * Envelope parameters can be provided as lambdas for dynamic control.
  *
- * @param attack Lambda returning the attack time.
- * @param decay Lambda returning the decay time.
- * @param sustain Lambda returning the sustain level.
- * @param release Lambda returning the release time.
- * @param gate Lambda returning the gate signal (note on/off).
- * Changing gate resets the envelope.
+ * @param attack Lambda returning the attack time in seconds.
+ * @param decay Lambda returning the decay time in seconds.
+ * @param sustain Lambda returning the sustain level. The value should be between 0.0 and 1.0.
+ * @param release Lambda returning the release time in seconds.
+ * @param gate Lambda returning the gate signal. `true` triggers the attack/decay/sustain phases, `false` triggers the release phase.
  */
 @Composable
 public fun VolumeEnvelope(
@@ -47,11 +46,11 @@ public fun VolumeEnvelope(
 /**
  * Composable for applying an ADSR envelope to the audio signal.
  *
- * @param attack The attack time.
- * @param decay The decay time.
- * @param sustain The sustain level.
- * @param release The release time.
- * @param gate The gate signal (note on/off).
+ * @param attack The attack time in seconds.
+ * @param decay The decay time in seconds.
+ * @param sustain The sustain level. The value should be between 0.0 and 1.0.
+ * @param release The release time in seconds.
+ * @param gate The gate signal. `true` triggers the attack/decay/sustain phases, `false` triggers the release phase.
  */
 @Composable
 public fun VolumeEnvelope(

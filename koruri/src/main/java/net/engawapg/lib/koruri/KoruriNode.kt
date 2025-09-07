@@ -26,8 +26,8 @@ public interface AudioProcessorNode {
     /**
      * Processes the input audio signal and returns the processed result.
      *
-     * @param input The input audio data
-     * @return The processed audio data
+     * @param input The input audio sample array.
+     * @return The processed audio sample array.
      */
     public fun process(input: FloatArray): FloatArray
 }

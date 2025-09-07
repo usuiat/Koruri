@@ -24,7 +24,7 @@ import net.engawapg.lib.koruri.audio.Block
  * Composable for controlling audio volume.
  * Applies a constant volume to the audio signal.
  *
- * @param volume The volume value to apply.
+ * @param volume The volume level. 0.0 means silence, 1.0 means original volume. Values greater than 1.0 will amplify the signal.
  */
 @Composable
 public fun Volume(volume: Float) {
@@ -35,7 +35,7 @@ public fun Volume(volume: Float) {
  * Composable for controlling audio volume.
  * Applies a dynamic volume to the audio signal.
  *
- * @param volume A lambda that returns the current volume value.
+ * @param volume A lambda that returns the current volume level. 0.0 means silence, 1.0 means original volume. Values greater than 1.0 will amplify the signal.
  */
 @Composable
 public fun Volume(volume: () -> Float) {

@@ -34,7 +34,7 @@ import kotlin.uuid.Uuid
  *
  * @param note The note to play.
  * @param instrument The instrument definition.
- * @param amplitude The initial amplitude of the note.
+ * @param amplitude The initial amplitude of the note. The value should be between 0.0 and 1.0.
  */
 @Composable
 public fun InstrumentNote(
@@ -64,13 +64,14 @@ public fun InstrumentNote(
  * Musical note.
  *
  * @property pitch The pitch of the note.
- * @property id The unique identifier for the note.
+ * @property id The unique identifier for the note. A new ID is generated for each Note instance.
  */
 public class Note(
     public val pitch: Pitch,
 ) {
     public val id: Uuid = Uuid.random()
     public companion object {
+        /** A special note representing silence. */
         public val Silence: Note = Note(Pitch.Silence)
     }
 }
@@ -79,7 +80,7 @@ public class Note(
  * Definition of instrument sound
  *
  * @property modulator The FM synthesis modulator.
- * @property envelopeSpec The envelope animation specification.
+ * @property envelopeSpec The envelope animation specification that controls the volume change over time.
  */
 public data class Instrument(
     val modulator: FMSynthesisModulator,

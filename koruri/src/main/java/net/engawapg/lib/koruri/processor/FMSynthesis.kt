@@ -26,7 +26,7 @@ import kotlin.math.sin
  * Composable for FM synthesis.
  * Generates sound using frequency modulation synthesis.
  *
- * @param carrierFrequency The carrier frequency for FM synthesis.
+ * @param carrierFrequency The carrier frequency in Hz.
  * @param modulator The FM synthesis modulator parameters.
  */
 @Composable
@@ -43,7 +43,7 @@ public fun FMSynthesis(
  * FM synthesis modulator parameters.
  *
  * @property ratio The frequency ratio of the modulator to the carrier.
- * @property index The modulation index.
+ * @property index The modulation index, which controls the amount of frequency deviation.
  */
 public data class FMSynthesisModulator(
     val ratio: Float,

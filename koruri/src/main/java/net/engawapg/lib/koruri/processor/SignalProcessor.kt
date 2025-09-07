@@ -25,9 +25,9 @@ public interface SignalProcessor {
     /**
      * Processes the input audio signal and returns the processed result.
      *
-     * @param input The input audio data as a FloatArray.
-     * @param children The list of child nodes.
-     * @return The processed audio data as a FloatArray.
+     * @param input The input audio sample array.
+     * @param children The list of child audio processor nodes.
+     * @return The processed audio sample array.
      */
     public fun process(input: FloatArray, children: List<AudioProcessorNode>): FloatArray
 }

@@ -24,6 +24,7 @@ package net.engawapg.lib.koruri.processor
 public enum class Pitch(
     public val frequency: Float,
 ) {
+    /** Represents silence, with a frequency of 0 Hz. */
     Silence(0.0f),
     C4(261.63f),
     D4(293.66f),
