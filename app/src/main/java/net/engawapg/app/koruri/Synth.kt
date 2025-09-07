@@ -16,20 +16,26 @@
 
 package net.engawapg.app.koruri
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconButtonShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -42,7 +48,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
@@ -203,6 +209,7 @@ private fun SynthUi(
                 .padding(16.dp)
         ) {
             PlayControl(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                 isPlaying = synthState.isPlaying,
                 onPlayingChange = { onEvent(SynthEvent.OnPlayingChange(it)) },
                 onGateChange = { onEvent(SynthEvent.OnGateChange(it)) },
@@ -310,6 +317,7 @@ private fun SynthUi(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun PlayControl(
     isPlaying: Boolean,
@@ -318,33 +326,52 @@ private fun PlayControl(
     onFrequencyChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(modifier = modifier) {
-        // Large touch area for playing note
-        Box(
-            modifier = Modifier
-                .size(100.dp)
-                .background(MaterialTheme.colorScheme.primary)
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onPress = {
-                            onFrequencyChange(Pitch.C4.frequency)
-                            onGateChange(true)
-                            try {
-                                awaitRelease()
-                            } finally {
-                                onGateChange(false)
-                            }
-                        }
-                    )
-                }
-        )
-
-        // Play/Stop button
-        Button(
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        modifier = modifier
+    ) {
+        FilledTonalIconButton (
             onClick = { onPlayingChange(!isPlaying) },
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .size(
+                    IconButtonDefaults.largeContainerSize(
+                        widthOption = IconButtonDefaults.IconButtonWidthOption.Uniform
+                    )
+                )
         ) {
-            Text(if (isPlaying) "Stop" else "Play")
+            Icon(
+                painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
+                contentDescription = if (isPlaying) "Pause" else "Play",
+            )
+        }
+
+        Spacer(Modifier.width(8.dp))
+
+        val interactionSource = remember { MutableInteractionSource() }
+        val isPressed by interactionSource.collectIsPressedAsState()
+        LaunchedEffect(isPressed) {
+            if (isPressed) {
+                onFrequencyChange(Pitch.C4.frequency)
+                onGateChange(true)
+            } else {
+                onGateChange(false)
+            }
+        }
+        FilledIconButton(
+            onClick = {},
+            interactionSource = interactionSource,
+            shapes = IconButtonShapes(
+                shape = IconButtonDefaults.largeRoundShape,
+                pressedShape = IconButtonDefaults.largePressedShape
+            ),
+            modifier = Modifier
+                .size(IconButtonDefaults.largeContainerSize())
+                .weight(1f)
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.touch),
+                contentDescription = "Touch to play",
+            )
         }
     }
 }
