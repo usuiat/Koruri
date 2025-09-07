@@ -25,9 +25,12 @@ import kotlin.math.PI
  * Composable for generating a square wave.
  * Produces a square wave signal with specified amplitude, frequency, and pulse width.
  *
- * @param amplitude The amplitude of the square wave.
- * @param frequency The frequency of the square wave.
- * @param pulseWidth The pulse width of the square wave.
+ * @param amplitude The amplitude of the square wave. The value should be between 0.0 and 1.0.
+ * @param frequency The frequency of the square wave in Hz.
+ * @param pulseWidth The pulse width of the square wave. The value should be between -1.0 and 1.0.
+ * -1.0 means the output is always -amplitude.
+ * 0.0 means a 50% duty cycle.
+ * 1.0 means the output is always +amplitude.
  */
 @Composable
 public fun SquareWave(
@@ -42,9 +45,12 @@ public fun SquareWave(
  * Composable for generating a square wave.
  * Produces a square wave signal with specified amplitude, dynamic frequency, and dynamic pulse width.
  *
- * @param amplitude The amplitude of the square wave.
- * @param frequency A lambda returning the current frequency of the square wave.
- * @param pulseWidth A lambda returning the current pulse width of the square wave.
+ * @param amplitude The amplitude of the square wave. The value should be between 0.0 and 1.0.
+ * @param frequency A lambda returning the current frequency of the square wave in Hz.
+ * @param pulseWidth A lambda returning the current pulse width of the square wave. The value should be between -1.0 and 1.0.
+ * -1.0 means the output is always -amplitude.
+ * 0.0 means a 50% duty cycle.
+ * 1.0 means the output is always +amplitude.
  */
 @Composable
 public fun SquareWave(
