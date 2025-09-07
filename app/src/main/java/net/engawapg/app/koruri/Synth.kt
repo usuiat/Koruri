@@ -37,15 +37,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import net.engawapg.app.koruri.ui.theme.KoruriTheme
 import net.engawapg.lib.koruri.KoruriContent
 import net.engawapg.lib.koruri.processor.Chain
 import net.engawapg.lib.koruri.processor.LowPassFilter
@@ -54,28 +55,47 @@ import net.engawapg.lib.koruri.processor.SquareWave
 import net.engawapg.lib.koruri.processor.VolumeEnvelope
 import net.engawapg.lib.koruri.processor.produceLfo
 
+private data class SynthState(
+    val isPlaying: Boolean = false,
+    val gate: Boolean = false,
+    val frequency: Float = Pitch.C4.frequency,
+    // ADSR envelope parameters
+    val attack: Float = 0.03f,
+    val decay: Float = 0.20f,
+    val sustain: Float = 0.50f,
+    val release: Float = 0.30f,
+    // LFO frequency
+    val lfoFrequency: Float = 1.0f,
+    // Pulse Width Modulation parameters
+    val pulseWidth: Float = 0.0f,
+    val pwmAmount: Float = 0.0f,
+    // LPF parameters
+    val lpfCutoff: Float = 3000f,
+    val lpfResonance: Float = 0.1f,
+)
+
+private sealed interface SynthEvent {
+    data class OnPlayingChange(val isPlaying: Boolean) : SynthEvent
+    data class OnGateChange(val gate: Boolean) : SynthEvent
+    data class OnFrequencyChange(val frequency: Float) : SynthEvent
+    // ADSR envelope parameters
+    data class OnAttackChange(val attack: Float) : SynthEvent
+    data class OnDecayChange(val decay: Float) : SynthEvent
+    data class OnSustainChange(val sustain: Float) : SynthEvent
+    data class OnReleaseChange(val release: Float) : SynthEvent
+    // LFO frequency
+    data class OnLfoFrequencyChange(val lfoFrequency: Float) : SynthEvent
+    // Pulse Width Modulation parameters
+    data class OnPulseWidthChange(val pulseWidth: Float) : SynthEvent
+    data class OnPwmAmountChange(val pwmAmount: Float) : SynthEvent
+    // LPF parameters
+    data class OnLpfCutoffChange(val cutoff: Float) : SynthEvent
+    data class OnLpfResonanceChange(val resonance: Float) : SynthEvent
+}
+
 @Composable
 internal fun SynthScreen(modifier: Modifier = Modifier) {
-    var isPlaying by remember { mutableStateOf(false) }
-    var gate by remember { mutableStateOf(false) }
-    var frequency by remember { mutableFloatStateOf(65.41f) }
-
-    // ADSR parameters
-    var attack by remember { mutableFloatStateOf(0.01f) } // 非常に短いアタック
-    var decay by remember { mutableFloatStateOf(0.15f) }  // 短いディケイ
-    var sustain by remember { mutableFloatStateOf(0.4f) } // 低めのサスティン
-    var release by remember { mutableFloatStateOf(0.01f) } // 短いリリース
-
-    // LPF parameters
-    var cutoff by remember { mutableFloatStateOf(20000f) }  // 少し高めのカットオフ
-    var resonance by remember { mutableFloatStateOf(0.1f) }  // 高めのレゾナンス
-
-    // Pulse Width Modulation parameters
-    var pulseWidth by remember { mutableFloatStateOf(0f) }      // ベースのPulse Width
-    var pwmAmount by remember { mutableFloatStateOf(0.0f) }         // モジュレーション量
-
-    // LFO frequency parameter
-    var lfoFreq by remember { mutableFloatStateOf(1.0f) } // デフォルト1Hz
+    var synthState by remember { mutableStateOf(SynthState()) }
 
     KoruriContent {
         ArpeggioLoop(
@@ -84,220 +104,55 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                 Pitch.F4, Pitch.C4, Pitch.F4, Pitch.G4
             ),
             bpm = 120f,
-            play = isPlaying
+            play = synthState.isPlaying
         ) { newPitch, newGate ->
-            frequency = newPitch.frequency
-            gate = newGate
+            synthState = synthState.copy(
+                gate = newGate,
+                frequency = newPitch.frequency
+            )
         }
 
-        val lfo by produceLfo(frequency = lfoFreq, gate = gate)
+        val lfo by produceLfo(frequency = synthState.lfoFrequency, gate = synthState.gate)
 
         Chain {
             SquareWave(
-                frequency = { frequency },
-                pulseWidth = { pulseWidth + lfo * pwmAmount * 0.5f }
+                frequency = { synthState.frequency },
+                pulseWidth = { synthState.pulseWidth + lfo * synthState.pwmAmount * 0.5f }
             )
             VolumeEnvelope(
-                attack = { attack },
-                decay = { decay },
-                sustain = { sustain },
-                release = { release },
-                gate = { gate }
+                attack = { synthState.attack },
+                decay = { synthState.decay },
+                sustain = { synthState.sustain },
+                release = { synthState.release },
+                gate = { synthState.gate }
             )
             LowPassFilter(
-                cutoff = { cutoff },
-                resonance = { resonance }
+                cutoff = { synthState.lpfCutoff },
+                resonance = { synthState.lpfResonance }
             )
         }
     }
 
-    Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp)
-        ) {
-            Row {
-                // Large touch area for playing note
-                Box(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .background(MaterialTheme.colorScheme.primary)
-                        .pointerInput(Unit) {
-                            detectTapGestures(
-                                onPress = {
-                                    frequency = Pitch.C4.frequency
-                                    gate = true
-                                    try {
-                                        awaitRelease()
-                                    } finally {
-                                        gate = false
-                                    }
-                                }
-                            )
-                        }
-                )
-
-                // Play/Stop button
-                Button(
-                    onClick = { isPlaying = !isPlaying },
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(if (isPlaying) "Stop" else "Play")
-                }
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-
-                // ADSR controls
-                Card(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text(
-                            text = "ADSR Envelope",
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-
-                        // Attack
-                        Text("Attack: ${"%.2f".format(attack)}s")
-                        Slider(
-                            value = attack,
-                            onValueChange = { attack = it },
-                            valueRange = 0.01f..2.0f,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        // Decay
-                        Text("Decay: ${"%.2f".format(decay)}s")
-                        Slider(
-                            value = decay,
-                            onValueChange = { decay = it },
-                            valueRange = 0.01f..2.0f,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        // Sustain
-                        Text("Sustain: ${"%.2f".format(sustain)}")
-                        Slider(
-                            value = sustain,
-                            onValueChange = { sustain = it },
-                            valueRange = 0.0f..1.0f,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        // Release
-                        Text("Release: ${"%.2f".format(release)}s")
-                        Slider(
-                            value = release,
-                            onValueChange = { release = it },
-                            valueRange = 0.01f..3.0f,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                }
-
-                // Pulse Width Modulation controls
-                Card(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text(
-                            text = "Pulse Width Modulation",
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-
-                        // Base Pulse Width
-                        Text("Base Pulse Width: ${"%.2f".format(pulseWidth)}")
-                        Slider(
-                            value = pulseWidth,
-                            onValueChange = { pulseWidth = it },
-                            valueRange = -1f..1f,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        // PWM Amount
-                        Text("PWM Amount: ${"%.2f".format(pwmAmount)}")
-                        Slider(
-                            value = pwmAmount,
-                            onValueChange = { pwmAmount = it },
-                            valueRange = 0f..1f,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                }
-
-                // LPF controls
-                Card(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text(
-                            text = "Low Pass Filter",
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-
-                        // Cutoff
-                        Text("Cutoff: ${"%.1f".format(cutoff)} Hz")
-                        Slider(
-                            value = cutoff,
-                            onValueChange = { cutoff = it },
-                            valueRange = 20f..20000f,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        // Resonance
-                        Text("Resonance: ${"%.2f".format(resonance)}")
-                        Slider(
-                            value = resonance,
-                            onValueChange = { resonance = it },
-                            valueRange = 0.1f..10f,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                }
-
-                // LFO frequency control
-                Card(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text(
-                            text = "LFO Frequency",
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                        Text("LFO: ${"%.2f".format(lfoFreq)} Hz")
-                        Slider(
-                            value = lfoFreq,
-                            onValueChange = { lfoFreq = it },
-                            valueRange = 0.1f..10f,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                }
+    SynthUi(
+        modifier = modifier,
+        synthState = synthState,
+        onEvent = { event ->
+            synthState = when (event) {
+                is SynthEvent.OnPlayingChange -> synthState.copy(isPlaying = event.isPlaying)
+                is SynthEvent.OnGateChange -> synthState.copy(gate = event.gate)
+                is SynthEvent.OnFrequencyChange -> synthState.copy(frequency = event.frequency)
+                is SynthEvent.OnAttackChange -> synthState.copy(attack = event.attack)
+                is SynthEvent.OnDecayChange -> synthState.copy(decay = event.decay)
+                is SynthEvent.OnSustainChange -> synthState.copy(sustain = event.sustain)
+                is SynthEvent.OnReleaseChange -> synthState.copy(release = event.release)
+                is SynthEvent.OnLfoFrequencyChange -> synthState.copy(lfoFrequency = event.lfoFrequency)
+                is SynthEvent.OnPulseWidthChange -> synthState.copy(pulseWidth = event.pulseWidth)
+                is SynthEvent.OnPwmAmountChange -> synthState.copy(pwmAmount = event.pwmAmount)
+                is SynthEvent.OnLpfCutoffChange -> synthState.copy(lpfCutoff = event.cutoff)
+                is SynthEvent.OnLpfResonanceChange -> synthState.copy(lpfResonance = event.resonance)
             }
         }
-    }
+    )
 }
 
 @Composable
@@ -328,5 +183,200 @@ private fun ArpeggioLoop(
         } else {
             onStepChange(Pitch.Silence, false)
         }
+    }
+}
+
+@Composable
+private fun SynthUi(
+    synthState: SynthState,
+    onEvent: (SynthEvent) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(
+        modifier = modifier.fillMaxSize()
+    ) { innerPadding ->
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp)
+        ) {
+            Row {
+                // Large touch area for playing note
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .background(MaterialTheme.colorScheme.primary)
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onPress = {
+                                    onEvent(SynthEvent.OnFrequencyChange(Pitch.C4.frequency))
+                                    onEvent(SynthEvent.OnGateChange(true))
+                                    try {
+                                        awaitRelease()
+                                    } finally {
+                                        onEvent(SynthEvent.OnGateChange(false))
+                                    }
+                                }
+                            )
+                        }
+                )
+
+                // Play/Stop button
+                Button(
+                    onClick = { onEvent(SynthEvent.OnPlayingChange(!synthState.isPlaying)) },
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(if (synthState.isPlaying) "Stop" else "Play")
+                }
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                // ADSR envelope controls
+                Card {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        // Attack
+                        Text("Attack: ${"%.2f".format(synthState.attack)}s")
+                        Slider(
+                            value = synthState.attack,
+                            onValueChange = { onEvent(SynthEvent.OnAttackChange(it)) },
+                            valueRange = 0.01f..1.0f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        // Decay
+                        Text("Decay: ${"%.2f".format(synthState.decay)}s")
+                        Slider(
+                            value = synthState.decay,
+                            onValueChange = { onEvent(SynthEvent.OnDecayChange(it)) },
+                            valueRange = 0.01f..1.0f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        // Sustain
+                        Text("Sustain: ${"%.2f".format(synthState.sustain)}")
+                        Slider(
+                            value = synthState.sustain,
+                            onValueChange = { onEvent(SynthEvent.OnSustainChange(it)) },
+                            valueRange = 0.0f..1.0f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        // Release
+                        Text("Release: ${"%.2f".format(synthState.release)}s")
+                        Slider(
+                            value = synthState.release,
+                            onValueChange = { onEvent(SynthEvent.OnReleaseChange(it)) },
+                            valueRange = 0.01f..2.0f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+
+                // LFO frequency control
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "LFO Frequency",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        Text("LFO: ${"%.2f".format(synthState.lfoFrequency)} Hz")
+                        Slider(
+                            value = synthState.lfoFrequency,
+                            onValueChange = { onEvent(SynthEvent.OnLfoFrequencyChange(it)) },
+                            valueRange = 0.1f..10f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+                // Pulse Width Modulation controls
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Pulse Width Modulation",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
+                        // Base Pulse Width
+                        Text("Base Pulse Width: ${"%.2f".format(synthState.pulseWidth)}")
+                        Slider(
+                            value = synthState.pulseWidth,
+                            onValueChange = { onEvent(SynthEvent.OnPulseWidthChange(it)) },
+                            valueRange = -1f..1f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        // PWM Amount
+                        Text("PWM Amount: ${"%.2f".format(synthState.pwmAmount)}")
+                        Slider(
+                            value = synthState.pwmAmount,
+                            onValueChange = { onEvent(SynthEvent.OnPwmAmountChange(it)) },
+                            valueRange = 0f..1f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+
+                // LPF controls
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Low-Pass Filter",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        // Cutoff Frequency
+                        Text("Cutoff Frequency: ${synthState.lpfCutoff.toInt()} Hz")
+                        Slider(
+                            value = synthState.lpfCutoff,
+                            onValueChange = { onEvent(SynthEvent.OnLpfCutoffChange(it)) },
+                            valueRange = 100f..10000f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        // Resonance
+                        Text("Resonance: ${"%.2f".format(synthState.lpfResonance)}")
+                        Slider(
+                            value = synthState.lpfResonance,
+                            onValueChange = { onEvent(SynthEvent.OnLpfResonanceChange(it)) },
+                            valueRange = 0.1f..5.0f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview(heightDp = 1200)
+@Composable
+private fun SynthUiPreview() {
+    KoruriTheme {
+        SynthUi(
+            synthState = SynthState(),
+            onEvent = {}
+        )
     }
 }
