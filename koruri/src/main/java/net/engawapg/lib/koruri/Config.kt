@@ -21,6 +21,10 @@ package net.engawapg.lib.koruri
  */
 public object KoruriAudioConfig {
     /**
+     * The sample rate used for audio processing in Koruri.
+     */
+    public const val SAMPLE_RATE: Int = 48000
+    /**
      * The buffer size in frames used for audio processing in Koruri.
      */
     public const val BUFFER_SIZE: Int = 128

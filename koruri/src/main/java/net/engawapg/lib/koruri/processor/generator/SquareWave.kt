@@ -18,6 +18,7 @@ package net.engawapg.lib.koruri.processor.generator
 
 import androidx.compose.runtime.Composable
 import net.engawapg.lib.koruri.AudioProcessorNode
+import net.engawapg.lib.koruri.KoruriAudioConfig.SAMPLE_RATE
 import net.engawapg.lib.koruri.audio.Block
 import net.engawapg.lib.koruri.processor.SignalProcessor
 import kotlin.math.PI
@@ -75,7 +76,6 @@ private class SquareWaveGenerator(
         pulseWidthValue: Float = 0f
     ) : this(amplitude, { frequencyValue }, { pulseWidthValue })
 
-    private val sampleRate = 48000
     private var phase = 0.0f
 
     override fun process(input: FloatArray, children: List<AudioProcessorNode>): FloatArray {
@@ -86,7 +86,7 @@ private class SquareWaveGenerator(
             return output
         }
 
-        val phaseDelta = PIx2 * frequency / sampleRate
+        val phaseDelta = PIx2 * frequency / SAMPLE_RATE
         for (i in input.indices) {
             // pulseWidth: -1=すべて負, 0=50%デューティ, +1=すべて正
             val normalizedPhase = phase / PIx2 // 0.0 to 1.0

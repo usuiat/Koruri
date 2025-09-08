@@ -18,6 +18,7 @@ package net.engawapg.lib.koruri.processor.volume
 
 import androidx.compose.runtime.Composable
 import net.engawapg.lib.koruri.AudioProcessorNode
+import net.engawapg.lib.koruri.KoruriAudioConfig.SAMPLE_RATE
 import net.engawapg.lib.koruri.audio.Block
 import net.engawapg.lib.koruri.processor.SignalProcessor
 
@@ -82,13 +83,12 @@ private class VolumeEnvelopeProcessor(
     private var envelope = 0f
     private var phaseTime = 0f
     private var releaseLevel = 0f
-    private val sampleRate = 48000
     private var previousGate = false
 
     override fun process(input: FloatArray, children: List<AudioProcessorNode>): FloatArray {
         // inputをコピーしてエンベロープ処理
         val output = input.copyOf()
-        val deltaTime = 1f / sampleRate
+        val deltaTime = 1f / SAMPLE_RATE
 
         for (i in input.indices) {
             // Check gate state changes

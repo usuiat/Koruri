@@ -19,10 +19,10 @@ package net.engawapg.lib.koruri.audio
 import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
+import net.engawapg.lib.koruri.KoruriAudioConfig.SAMPLE_RATE
 
 internal class KoruriAudio {
     companion object {
-        private const val SAMPLE_RATE = 48000
         private const val CHANNEL_OUT = AudioFormat.CHANNEL_OUT_STEREO
         private const val ENCODING = AudioFormat.ENCODING_PCM_FLOAT
     }

@@ -18,6 +18,7 @@ package net.engawapg.lib.koruri.processor.filter
 
 import androidx.compose.runtime.Composable
 import net.engawapg.lib.koruri.AudioProcessorNode
+import net.engawapg.lib.koruri.KoruriAudioConfig.SAMPLE_RATE
 import net.engawapg.lib.koruri.audio.Block
 import net.engawapg.lib.koruri.processor.SignalProcessor
 import kotlin.math.PI
@@ -61,7 +62,6 @@ private class LowPassFilterProcessor(
     private val resonance: () -> Float
 ) : SignalProcessor {
 
-    private val sampleRate = 48000
     private var x1 = 0f
     private var x2 = 0f
     private var y1 = 0f
@@ -76,7 +76,7 @@ private class LowPassFilterProcessor(
         val q = resonance()
 
         // バイクワッドフィルタの係数計算
-        val omega = 2.0 * PI * cutoffFreq / sampleRate
+        val omega = 2.0 * PI * cutoffFreq / SAMPLE_RATE
         val sinOmega = sin(omega).toFloat()
         val cosOmega = cos(omega).toFloat()
         val alpha = sinOmega / (2.0f * q)
