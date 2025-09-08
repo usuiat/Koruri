@@ -35,7 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.engawapg.lib.koruri.KoruriContent
-import net.engawapg.lib.koruri.processor.SineWave
+import net.engawapg.lib.koruri.processor.generator.SineWave
 
 @Composable
 internal fun SineWaveScreen(

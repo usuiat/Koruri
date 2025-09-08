@@ -55,11 +55,11 @@ import kotlinx.coroutines.delay
 import net.engawapg.app.koruri.ui.theme.KoruriTheme
 import net.engawapg.lib.koruri.KoruriContent
 import net.engawapg.lib.koruri.processor.Chain
-import net.engawapg.lib.koruri.processor.LowPassFilter
-import net.engawapg.lib.koruri.processor.Pitch
-import net.engawapg.lib.koruri.processor.SquareWave
-import net.engawapg.lib.koruri.processor.VolumeEnvelope
-import net.engawapg.lib.koruri.processor.produceLfo
+import net.engawapg.lib.koruri.processor.filter.LowPassFilter
+import net.engawapg.lib.koruri.processor.generator.Pitch
+import net.engawapg.lib.koruri.processor.generator.SquareWave
+import net.engawapg.lib.koruri.processor.volume.VolumeEnvelope
+import net.engawapg.lib.koruri.processor.modulator.produceLfo
 
 private data class SynthState(
     val isPlaying: Boolean = false,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.engawapg.lib.koruri.processor
+package net.engawapg.lib.koruri.processor.generator
 
 /**
  * Enum representing musical pitches and their corresponding frequencies.

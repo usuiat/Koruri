@@ -16,7 +16,7 @@
 
 @file:OptIn(ExperimentalUuidApi::class)
 
-package net.engawapg.lib.koruri.processor
+package net.engawapg.lib.koruri.processor.generator
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
@@ -25,6 +25,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import net.engawapg.lib.koruri.processor.Chain
+import net.engawapg.lib.koruri.processor.volume.Volume
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

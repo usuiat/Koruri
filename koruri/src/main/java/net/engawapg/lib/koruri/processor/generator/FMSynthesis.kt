@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package net.engawapg.lib.koruri.processor
+package net.engawapg.lib.koruri.processor.generator
 
 import androidx.compose.runtime.Composable
 import net.engawapg.lib.koruri.AudioProcessorNode
 import net.engawapg.lib.koruri.audio.Block
+import net.engawapg.lib.koruri.processor.SignalProcessor
 import kotlin.math.PI
 import kotlin.math.sin
 

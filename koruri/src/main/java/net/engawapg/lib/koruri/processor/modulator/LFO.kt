@@ -1,4 +1,4 @@
-package net.engawapg.lib.koruri.processor
+package net.engawapg.lib.koruri.processor.modulator
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState

@@ -32,10 +32,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.engawapg.lib.koruri.KoruriContent
-import net.engawapg.lib.koruri.processor.Instrument
-import net.engawapg.lib.koruri.processor.InstrumentNote
-import net.engawapg.lib.koruri.processor.Note
-import net.engawapg.lib.koruri.processor.Pitch
+import net.engawapg.lib.koruri.processor.generator.Instrument
+import net.engawapg.lib.koruri.processor.generator.InstrumentNote
+import net.engawapg.lib.koruri.processor.generator.Note
+import net.engawapg.lib.koruri.processor.generator.Pitch
 
 @Composable
 internal fun InstrumentsScreen(

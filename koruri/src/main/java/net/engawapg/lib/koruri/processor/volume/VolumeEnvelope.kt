@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package net.engawapg.lib.koruri.processor
+package net.engawapg.lib.koruri.processor.volume
 
 import androidx.compose.runtime.Composable
 import net.engawapg.lib.koruri.AudioProcessorNode
 import net.engawapg.lib.koruri.audio.Block
+import net.engawapg.lib.koruri.processor.SignalProcessor
 
 /**
  * Composable for applying an ADSR envelope to the audio signal.

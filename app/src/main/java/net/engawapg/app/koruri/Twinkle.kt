@@ -33,22 +33,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.delay
 import net.engawapg.lib.koruri.KoruriContent
-import net.engawapg.lib.koruri.processor.Instrument
-import net.engawapg.lib.koruri.processor.InstrumentNote
+import net.engawapg.lib.koruri.processor.generator.Instrument
+import net.engawapg.lib.koruri.processor.generator.InstrumentNote
 import net.engawapg.lib.koruri.processor.Mix
-import net.engawapg.lib.koruri.processor.Note
-import net.engawapg.lib.koruri.processor.Pitch.A5
-import net.engawapg.lib.koruri.processor.Pitch.C4
-import net.engawapg.lib.koruri.processor.Pitch.C5
-import net.engawapg.lib.koruri.processor.Pitch.D4
-import net.engawapg.lib.koruri.processor.Pitch.D5
-import net.engawapg.lib.koruri.processor.Pitch.E4
-import net.engawapg.lib.koruri.processor.Pitch.E5
-import net.engawapg.lib.koruri.processor.Pitch.F4
-import net.engawapg.lib.koruri.processor.Pitch.F5
-import net.engawapg.lib.koruri.processor.Pitch.G4
-import net.engawapg.lib.koruri.processor.Pitch.G5
-import net.engawapg.lib.koruri.processor.Pitch.Silence
+import net.engawapg.lib.koruri.processor.generator.Note
+import net.engawapg.lib.koruri.processor.generator.Pitch.A5
+import net.engawapg.lib.koruri.processor.generator.Pitch.C4
+import net.engawapg.lib.koruri.processor.generator.Pitch.C5
+import net.engawapg.lib.koruri.processor.generator.Pitch.D4
+import net.engawapg.lib.koruri.processor.generator.Pitch.D5
+import net.engawapg.lib.koruri.processor.generator.Pitch.E4
+import net.engawapg.lib.koruri.processor.generator.Pitch.E5
+import net.engawapg.lib.koruri.processor.generator.Pitch.F4
+import net.engawapg.lib.koruri.processor.generator.Pitch.F5
+import net.engawapg.lib.koruri.processor.generator.Pitch.G4
+import net.engawapg.lib.koruri.processor.generator.Pitch.G5
+import net.engawapg.lib.koruri.processor.generator.Pitch.Silence
 
 @Composable
 internal fun TwinkleScreen(
