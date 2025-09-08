@@ -39,6 +39,7 @@ import androidx.compose.material3.IconButtonShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -81,6 +82,7 @@ private data class SynthState(
     // LPF parameters
     val lpfCutoff: Float = 3000f,
     val lpfResonance: Float = 1.0f,
+    val lpfEnabled: Boolean = true,
 )
 
 private sealed interface SynthEvent {
@@ -102,6 +104,7 @@ private sealed interface SynthEvent {
     // LPF parameters
     data class OnLpfCutoffChange(val cutoff: Float) : SynthEvent
     data class OnLpfResonanceChange(val resonance: Float) : SynthEvent
+    data class OnLpfEnabledChange(val enabled: Boolean) : SynthEvent
 }
 
 @Composable
@@ -137,10 +140,12 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                 release = { synthState.release },
                 gate = { synthState.gate }
             )
-            LowPassFilter(
-                cutoff = { synthState.lpfCutoff },
-                resonance = { synthState.lpfResonance }
-            )
+            if (synthState.lpfEnabled) {
+                LowPassFilter(
+                    cutoff = { synthState.lpfCutoff },
+                    resonance = { synthState.lpfResonance }
+                )
+            }
         }
     }
 
@@ -162,6 +167,7 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                 is SynthEvent.OnVibratoAmountChange -> synthState.copy(vibratoAmount = event.vibratoAmount)
                 is SynthEvent.OnLpfCutoffChange -> synthState.copy(lpfCutoff = event.cutoff)
                 is SynthEvent.OnLpfResonanceChange -> synthState.copy(lpfResonance = event.resonance)
+                is SynthEvent.OnLpfEnabledChange -> synthState.copy(lpfEnabled = event.enabled)
             }
         }
     )
@@ -312,6 +318,18 @@ private fun SynthUi(
 
                 // LPF controls
                 ParameterCard("Low-Pass Filter") {
+                    // On/Off Switch
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Enabled")
+                        Spacer(Modifier.weight(1f))
+                        Switch(
+                            checked = synthState.lpfEnabled,
+                            onCheckedChange = { onEvent(SynthEvent.OnLpfEnabledChange(it)) }
+                        )
+                    }
                     // Cutoff Frequency
                     Text("Cutoff Frequency: ${synthState.lpfCutoff.toInt()} Hz")
                     Slider(
@@ -413,7 +431,7 @@ private fun ParameterCard(
     }
 }
 
-@Preview(heightDp = 1200)
+@Preview(heightDp = 1500)
 @Composable
 private fun SynthUiPreview() {
     KoruriTheme {
