@@ -71,13 +71,13 @@ private data class SynthState(
     val sustain: Float = 0.50f,
     val release: Float = 0.30f,
     // LFO frequency
-    val lfoFrequency: Float = 1.0f,
+    val lfoFrequency: Float = 4.0f,
     // Pulse Width Modulation parameters
-    val pulseWidth: Float = 0.0f,
-    val pwmAmount: Float = 0.0f,
+    val pulseWidth: Float = 0.35f,
+    val pwmAmount: Float = 0.25f,
     // LPF parameters
     val lpfCutoff: Float = 3000f,
-    val lpfResonance: Float = 0.1f,
+    val lpfResonance: Float = 1.0f,
 )
 
 private sealed interface SynthEvent {
