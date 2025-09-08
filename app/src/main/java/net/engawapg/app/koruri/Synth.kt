@@ -106,8 +106,8 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
     KoruriContent {
         ArpeggioLoop(
             pattern = listOf(
-                Pitch.C4, Pitch.G4, Pitch.A4, Pitch.E4,
-                Pitch.F4, Pitch.C4, Pitch.F4, Pitch.G4
+                Pitch.C2, Pitch.G2, Pitch.A2, Pitch.E2,
+                Pitch.F2, Pitch.C2, Pitch.F2, Pitch.G2
             ),
             bpm = 120f,
             play = synthState.isPlaying
