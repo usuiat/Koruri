@@ -1,8 +1,5 @@
 $dokka.format:html-v1
 $dokka.linkExtension:html
-$dokka.location:net.engawapg.lib.koruri.audio////PointingToDeclaration/koruri/net.engawapg.lib.koruri.audio/index.html
-$dokka.location:net.engawapg.lib.koruri.audio//Block/#kotlin.Function0[kotlin.Unit]#net.engawapg.lib.koruri.processor.SignalProcessor/PointingToDeclaration/koruri/net.engawapg.lib.koruri.audio/-block.html
-$dokka.location:net.engawapg.lib.koruri.audio//Block/#net.engawapg.lib.koruri.processor.SignalProcessor/PointingToDeclaration/koruri/net.engawapg.lib.koruri.audio/-block.html
 $dokka.location:net.engawapg.lib.koruri.processor.filter////PointingToDeclaration/koruri/net.engawapg.lib.koruri.processor.filter/index.html
 $dokka.location:net.engawapg.lib.koruri.processor.filter//LowPassFilter/#kotlin.Float#kotlin.Float/PointingToDeclaration/koruri/net.engawapg.lib.koruri.processor.filter/-low-pass-filter.html
 $dokka.location:net.engawapg.lib.koruri.processor.filter//LowPassFilter/#kotlin.Function0[kotlin.Float]#kotlin.Function0[kotlin.Float]/PointingToDeclaration/koruri/net.engawapg.lib.koruri.processor.filter/-low-pass-filter.html
@@ -105,6 +102,8 @@ $dokka.location:net.engawapg.lib.koruri.processor//Mix/#kotlin.Function0[kotlin.
 $dokka.location:net.engawapg.lib.koruri.processor/SignalProcessor///PointingToDeclaration/koruri/net.engawapg.lib.koruri.processor/-signal-processor/index.html
 $dokka.location:net.engawapg.lib.koruri.processor/SignalProcessor/process/#kotlin.FloatArray#kotlin.collections.List[net.engawapg.lib.koruri.AudioProcessorNode]/PointingToDeclaration/koruri/net.engawapg.lib.koruri.processor/-signal-processor/process.html
 $dokka.location:net.engawapg.lib.koruri////PointingToDeclaration/koruri/net.engawapg.lib.koruri/index.html
+$dokka.location:net.engawapg.lib.koruri//Block/#kotlin.Function0[kotlin.Unit]#net.engawapg.lib.koruri.processor.SignalProcessor/PointingToDeclaration/koruri/net.engawapg.lib.koruri/-block.html
+$dokka.location:net.engawapg.lib.koruri//Block/#net.engawapg.lib.koruri.processor.SignalProcessor/PointingToDeclaration/koruri/net.engawapg.lib.koruri/-block.html
 $dokka.location:net.engawapg.lib.koruri//KoruriContent/#kotlin.Function0[kotlin.Unit]/PointingToDeclaration/koruri/net.engawapg.lib.koruri/-koruri-content.html
 $dokka.location:net.engawapg.lib.koruri//setKoruriContent/#kotlin.Function0[kotlin.Unit]/PointingToDeclaration/koruri/net.engawapg.lib.koruri/set-koruri-content.html
 $dokka.location:net.engawapg.lib.koruri/AudioProcessorNode///PointingToDeclaration/koruri/net.engawapg.lib.koruri/-audio-processor-node/index.html
@@ -113,7 +112,6 @@ $dokka.location:net.engawapg.lib.koruri/KoruriAudioConfig///PointingToDeclaratio
 $dokka.location:net.engawapg.lib.koruri/KoruriAudioConfig/BUFFER_SIZE/#/PointingToDeclaration/koruri/net.engawapg.lib.koruri/-koruri-audio-config/-b-u-f-f-e-r_-s-i-z-e.html
 $dokka.location:net.engawapg.lib.koruri/KoruriAudioConfig/SAMPLE_RATE/#/PointingToDeclaration/koruri/net.engawapg.lib.koruri/-koruri-audio-config/-s-a-m-p-l-e_-r-a-t-e.html
 net.engawapg.lib.koruri
-net.engawapg.lib.koruri.audio
 net.engawapg.lib.koruri.processor
 net.engawapg.lib.koruri.processor.filter
 net.engawapg.lib.koruri.processor.generator
