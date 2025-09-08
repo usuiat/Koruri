@@ -19,7 +19,7 @@ package net.engawapg.lib.koruri.processor.volume
 import androidx.compose.runtime.Composable
 import net.engawapg.lib.koruri.AudioProcessorNode
 import net.engawapg.lib.koruri.KoruriAudioConfig.SAMPLE_RATE
-import net.engawapg.lib.koruri.audio.Block
+import net.engawapg.lib.koruri.Block
 import net.engawapg.lib.koruri.processor.SignalProcessor
 
 /**

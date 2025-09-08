@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package net.engawapg.lib.koruri.audio
+package net.engawapg.lib.koruri
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReusableComposeNode
-import net.engawapg.lib.koruri.KoruriApplier
-import net.engawapg.lib.koruri.KoruriNode
 import net.engawapg.lib.koruri.processor.SignalProcessor
 
 /**
