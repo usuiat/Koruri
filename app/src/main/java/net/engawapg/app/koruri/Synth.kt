@@ -60,6 +60,7 @@ import net.engawapg.lib.koruri.processor.generator.Pitch
 import net.engawapg.lib.koruri.processor.generator.SquareWave
 import net.engawapg.lib.koruri.processor.volume.VolumeEnvelope
 import net.engawapg.lib.koruri.processor.modulator.produceLfo
+import kotlin.math.pow
 
 private data class SynthState(
     val isPlaying: Boolean = false,
@@ -75,6 +76,8 @@ private data class SynthState(
     // Pulse Width Modulation parameters
     val pulseWidth: Float = 0.35f,
     val pwmAmount: Float = 0.25f,
+    // Vibrato
+    val vibratoAmount: Float = 1.0f, // [st]
     // LPF parameters
     val lpfCutoff: Float = 3000f,
     val lpfResonance: Float = 1.0f,
@@ -94,6 +97,8 @@ private sealed interface SynthEvent {
     // Pulse Width Modulation parameters
     data class OnPulseWidthChange(val pulseWidth: Float) : SynthEvent
     data class OnPwmAmountChange(val pwmAmount: Float) : SynthEvent
+    // Vibrato
+    data class OnVibratoAmountChange(val vibratoAmount: Float) : SynthEvent
     // LPF parameters
     data class OnLpfCutoffChange(val cutoff: Float) : SynthEvent
     data class OnLpfResonanceChange(val resonance: Float) : SynthEvent
@@ -122,7 +127,7 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
 
         Chain {
             SquareWave(
-                frequency = { synthState.frequency },
+                frequency = { synthState.frequency * 2.0f.pow(lfo * synthState.vibratoAmount / 12) },
                 pulseWidth = { synthState.pulseWidth + lfo * synthState.pwmAmount * 0.5f }
             )
             VolumeEnvelope(
@@ -154,6 +159,7 @@ internal fun SynthScreen(modifier: Modifier = Modifier) {
                 is SynthEvent.OnLfoFrequencyChange -> synthState.copy(lfoFrequency = event.lfoFrequency)
                 is SynthEvent.OnPulseWidthChange -> synthState.copy(pulseWidth = event.pulseWidth)
                 is SynthEvent.OnPwmAmountChange -> synthState.copy(pwmAmount = event.pwmAmount)
+                is SynthEvent.OnVibratoAmountChange -> synthState.copy(vibratoAmount = event.vibratoAmount)
                 is SynthEvent.OnLpfCutoffChange -> synthState.copy(lpfCutoff = event.cutoff)
                 is SynthEvent.OnLpfResonanceChange -> synthState.copy(lpfResonance = event.resonance)
             }
@@ -289,6 +295,17 @@ private fun SynthUi(
                         value = synthState.pwmAmount,
                         onValueChange = { onEvent(SynthEvent.OnPwmAmountChange(it)) },
                         valueRange = 0f..1f,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                // Vibrato control
+                ParameterCard("Vibrato") {
+                    Text("Vibrato Depth: ${"%.2f".format(synthState.vibratoAmount)} st")
+                    Slider(
+                        value = synthState.vibratoAmount,
+                        onValueChange = { onEvent(SynthEvent.OnVibratoAmountChange(it)) },
+                        valueRange = 0f..12f,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
