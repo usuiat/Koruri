@@ -13,11 +13,7 @@ It enables you to describe audio processing declaratively using composable funct
 
 You can define waveforms and apply effects to produce various sounds.
 
-
-
-https://github.com/user-attachments/assets/7364db6c-6bcd-4254-95ff-bdb551d72b43
-
-
+https://github.com/user-attachments/assets/2ac955bb-2d55-472d-b4bf-3f6464ac1902
 
 ## Requirements
 
