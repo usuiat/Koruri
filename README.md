@@ -5,6 +5,9 @@
 Koruri is a declarative audio processing library built using Jetpack Compose runtime.
 It enables you to describe audio processing declaratively using composable functions.
 
+[You can watch the video introducing Koruri at DroidKaigi 2025 here](https://2025.droidkaigi.jp/en/timetable/936837/).
+
+
 > [!WARNING]
 > Koruri is an EXPERIMENTAL project.
 > Do not use it in commercial products.
